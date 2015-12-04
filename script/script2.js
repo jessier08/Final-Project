@@ -14,7 +14,7 @@ var map2 = d3.select('.canvas')
 var scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
     scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]),
     scaleR2 = d3.scale.linear().domain([100000,7000000]).range([5,80]);
-    scaleColor = d3.scale.linear().domain([15,35]).range(['white','#E53D1C']);
+    scaleColor = d3.scale.linear().domain([15,35]).range(['white','#81C219']);
 
 var axisX = d3.svg.axis()
     .orient('bottom')
@@ -54,7 +54,6 @@ queue()
             .attr('r', function(d){
                 return scaleR2(d.popObese);
             })
-            // .attr('r',5)
             .style('fill', function(d){
                 return scaleColor(d.pctObese)
             })
@@ -62,41 +61,35 @@ queue()
          
         function attachTooltip(selection){
         selection
-        .on('mouseenter',function(d){
+            .on('mouseenter',function(d){
             var tooltip = d3.select('.custom-tooltip');
             
             tooltip
                 .transition()
                 .style('opacity',1);
            
+            tooltip.select('#name').html(d.name);
             tooltip.select('#obese').html(d.pctObese);
             tooltip.select('#park').html(d.pctPark); 
             tooltip.select('#income').html(d.income); 
-        })
+            })
 
-        .on('mousemove',function(){
+            .on('mousemove',function(){
             var xy = d3.mouse(map2.node());
             
             var tooltip = d3.select('.custom-tooltip');
             
             tooltip
-                .style('left',xy[0]+10+'px')
-                .style('top',(xy[1]+10)+'px');
-        })
-        .on('mouseleave',function(){
+                .style('left',(d3.event.pageX+"px"))
+                .style('top',(d3.event.pageY+"px"))
+            })
+
+            .on('mouseleave',function(){
             d3.select('.custom-tooltip')
                 .transition()
                 .style('opacity',0);
-        })
-}   
-
-        // d3.selectAll('.btn-group').on('click', function(){
-        //     var button = d3.select(this).attr('id');
-
-        //     if(button == 'scatterplot'){
-
-        //     }
-        // })
+            }) 
+        }  
     })
 
 

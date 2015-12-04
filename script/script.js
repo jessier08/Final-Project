@@ -29,6 +29,9 @@ queue()
     .defer(d3.csv, "data/obese.csv", parseData)
 	.await(function(err, states, obesity){ 
 
+        console.log("Does it exist?");
+        console.log(obByState);
+
         var maxOb = d3.max(obesity);
         scaleR.domain([0,maxOb.popObese]);
 
@@ -38,6 +41,11 @@ queue()
         //construct a new array of data
         var data = states.features.map(function(d){
             var centroid = path.centroid(d);
+
+            if(!obByState.get(+d.properties.STATE)){
+                console.log(d.properties.STATE + " not found");
+                return;
+            }
 
             return {
                 stateName:d.properties.NAME,
@@ -50,10 +58,10 @@ queue()
             }
         });
         
-        console.log(data);
-
+        data = data.filter(function(d){return d!=undefined});
+        
 		var nodes = map.selectAll('.state')
-            .data(data, function(d){return +d.state})
+            .data(data, function(d){return d.state})
             .enter()
             .append('g')
             .attr('class','state');
@@ -143,7 +151,7 @@ queue()
 function parseData(d){
     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
 
-    obByState.set(d.STATE,{
+    obByState.set(+d.STATE,{
         name: d.NAME,
         state: +d.STATE,
         popObese:+d.popObese,
