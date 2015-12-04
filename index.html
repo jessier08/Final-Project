@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>d3 Final</title>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,400italic' rel='stylesheet' type='text/css'>
+        <link href="css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="style.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Obesity x Park Proximity x Income</h1>
+			<div class="canvas" id="map">
+			</div>
+			<!-- <div class="btn-group" role="group" aria-label="...">
+                	<button type="button" class="btn btn-default year" id="scatterplot">plot</button>
+                	<button type="button" class="btn btn-default year" id="scaled">scaled</button>
+           	</div> -->
+			<div class="canvas" id="map2">
+				<div class="custom-tooltip">
+                    <h2 id="name"></h2>
+                    <p><span id="obese"></span></p>
+                    <p><span id="park"></span></p>
+                    <p><span id="income"></span></p>
+                </div>
+			</div>
+			
+			
+
+		</div><!--.container-->
+
+		<!-- Scripts -->
+        <script src="script/lib/d3/d3.min.js" charset="utf-8"></script>
+        <script src="script/lib/queue/queue.min.js"></script>
+        <script src="script/script.js"></script>
+        <script src="script/script2.js"></script>
+	</body>
+</html>

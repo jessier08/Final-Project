@@ -1,0 +1,65 @@
+html,body,div,ul,li,svg{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+/*------------Global-------------*/
+html,body{
+    height: 100%;
+    position: relative;
+}
+
+.container .section{
+    width:100%;
+}
+.container .canvas{
+    width:100%;
+    background:white;
+    height:700px;
+}
+.container .controls{
+    margin-bottom:20px;
+}
+
+/*-----------tooltip-----------*/
+.canvas .custom-tooltip{
+    position:absolute;
+    background-color: red;
+    width:70px;
+    min-height:10px;
+    text-align: center;
+}
+
+/*------------font-------------*/
+body{
+    font-size: 16px;
+}
+h1{ font-size:2em;}
+h2{ font-size:1.3em;}
+p, svg text{
+    font-family:'MaisonNeue', sans-serif;
+}
+
+.axis{
+    font-size:.5em;
+    opacity: .5;
+    
+}
+
+@font-face{
+    font-family:MaisonNeue;
+    font-weight:bold;
+    src:url("./fonts/maisonneue/MaisonNeueTRIAL-Bold.otf");
+}
+@font-face{
+    font-family:MaisonNeue;
+    font-weight:normal;
+    src:url("./fonts/maisonneue/MaisonNeueTRIAL-Demi.otf");
+}
+/*------------map-------------*/
+.state {
+    opacity: .8;
+    stroke:white;
+    stroke-width:1px;
+}

@@ -1,0 +1,52 @@
+REGION,DIVISION,STATE,NAME,popObese,pctObese
+3,6,01,Alabama,1198253,33
+4,9,02,Alaska,148425,25.7
+4,8,04,Arizona,1118247,26
+3,7,05,Arkansas,720707,34.5
+4,9,06,California,6245664,25
+4,8,08,Colorado,764921,20.5
+1,1,09,Connecticut,662834,25.6
+3,5,10,Delaware,198343,26.9
+3,5,11,District of Columbia,111351,21.9
+3,5,12,Florida,377397,25.2
+3,5,13,Georgia,2067643,29.1
+4,9,15,Hawaii,232720,23.6
+4,8,16,Idaho,311906,26.8
+2,3,17,Illinois,2592853,28.1
+2,3,18,Indiana,1492605,31.4
+2,4,19,Iowa,693423,30.4
+2,4,20,Kansas,627084,29.9
+3,6,21,Kentucky,1048808,31.3
+3,7,22,Louisiana,1155621,34.7
+1,1,23,Maine,286908,28.4
+3,5,24,Maryland,1242751,27.6
+1,1,25,Massachusetts,1193048,22.9
+2,3,26,Michigan,2303685,31.1
+2,4,27,Minnesota,1041181,25.7
+3,6,28,Mississippi,760048,34.6
+2,4,29,Missouri,1365174,29.6
+4,8,30,Montana,185859,24.3
+2,4,31,Nebraska,395279,28.6
+4,8,32,Nevada,515754,26.2
+1,1,33,New Hampshire,274364,27.3
+1,2,34,New Jersey,1633276,24.6
+4,8,35,New Mexico,356345,27.1
+1,2,36,New York,3564869,23.6
+3,5,37,North Carolina,2094436,29.6
+2,4,38,North Dakota,157648,29.7
+2,3,39,Ohio,2609274,30.1
+3,7,40,Oklahoma,898600,32.3
+4,9,41,Oregon,765227,27.3
+1,2,42,Pennsylvania,2782229,29.1
+1,1,44,Rhode Island,210603,25.7
+3,5,45,South Carolina,1108431,31.6
+2,4,46,South Dakota,2396709,28.1
+3,6,47,Tennessee,1542526,31.1
+3,7,48,Texas,5204739,29.2
+4,8,49,Utah,467736,24.3
+1,1,50,Vermont,116741,23.7
+3,5,51,Virginia,1666682,27.4
+4,9,53,Washington,1396907,26.8
+3,5,54,West Virginia,486372,33.8
+2,3,55,Wisconsin,1248156,29.7
+4,8,56,Wyoming,112903,24.6
