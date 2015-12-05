@@ -68,8 +68,9 @@ p, svg text{
     src:url("./fonts/maisonneue/MaisonNeueTRIAL-Demi.otf");
 }
 /*------------map-------------*/
-.state text{
+.stateAbr {
     font-size:10px;
+    opacity:.6;
 }
 .circle {
     stroke:white;

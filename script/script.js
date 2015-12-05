@@ -19,7 +19,7 @@ var path = d3.geo.path()
 var obByState = d3.map();
 
 //Scales
-var scaleR = d3.scale.linear().domain([100000,6300000]).range([8,80]),
+var scaleR = d3.scale.linear().domain([100000,6300000]).range([10,80]),
     scaleColor = d3.scale.linear().domain([12,27]).range(['white','#B74077']);
 
 
@@ -59,13 +59,6 @@ queue()
         data = data.filter(function(d){return d!=undefined});
         
 		//enter exit update
-        // map.selectAll('state')
-        //     .data(states.features)
-        //     .enter()
-        //     .append('path')
-        //     .attr('d',path)
-        //     .attr('class','backMap');
-
         var nodes = map.selectAll('state')
             .data(data, function(d){return d.state})
             .enter()
@@ -85,14 +78,14 @@ queue()
             })
 
         // text will be in tooltip
-            
-        // nodes
-        //     .append('text')
-        //     .text(function(d){
-        //         return d.stateName;
-        //     })
-        //     .attr('text-anchor','middle')
-        //     .attr('transform','translate('+0+','+4+')');
+        nodes
+            .append('text')
+            .attr('class','stateAbr')
+            .text(function(d){
+                return (obByState.get(+d.state)).abbr;
+            })
+            .attr('text-anchor','middle')
+            .attr('transform','translate('+0+','+4+')');
 
         //force layout
         var force = d3.layout.force()
@@ -198,7 +191,8 @@ function parseData(d){
         pctPark: +d.pctPark,
         income: +d.income,
         popObese: +d.popObese,
-        pctObese: +d.pctObese
+        pctObese: +d.pctObese,
+        abbr: d.ABR
     });
 
     return {
@@ -207,6 +201,7 @@ function parseData(d){
         pctPark: +d.pctPark,
         income: +d.income,
         popObese: +d.popObese,
-        pctObese: +d.pctObese
+        pctObese: +d.pctObese,
+        abbr: d.ABR
     };
 }
