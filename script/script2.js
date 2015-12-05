@@ -9,6 +9,13 @@ var map2 = d3.select('.canvas')
     .append('g')
     .attr('transform',"translate("+margin.l+","+margin.t+")");
 
+var map3 = d3.select('.canvas')
+    .append('svg')
+    .attr('width',width+margin.l+margin.r)
+    .attr('height',height+margin.t+margin.b)
+    .append('g')
+    .attr('transform',"translate("+margin.l+","+margin.t+")");
+
 //Set up projection and geo path generator
 
 var scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
@@ -17,10 +24,15 @@ var scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
 var axisX = d3.svg.axis()
     .orient('bottom')
     .tickSize(-height,0)
+    .ticks(2)
+    .tickValues([0,100])
     .scale(scaleX);
+
 var axisY = d3.svg.axis()
     .orient('left')
     .tickSize(-width,0)
+    .ticks(2)
+    .tickValues([0,80000])
     .scale(scaleY);
 
 queue()
@@ -30,13 +42,19 @@ queue()
         map2.append('g')
             .attr('class','axis')
             .attr('transform','translate(0,'+height+')')
-            .call(axisX);
+            .append('text')
+            .attr('text-anchor','right')
+            .text('% of People Living Within 1/2 mile of a Park');
+
         map2.append('g')
             .attr('class','axis')
-            .call(axisY);
+            .append('text')
+            .attr('transform','rotate(-90)')
+            .text('Income Per Capita');
 
         // console.log(parkIncOb);
 
+        //scaled scatterplot
         var nodes = map2.selectAll('.state')
             .data(parkIncOb, function(d){return d.state})
             .enter()
@@ -56,6 +74,23 @@ queue()
             .style('fill', function(d){
                 return scaleColor(d.pctObese)
             })
+
+        //scatterplot
+        var nodes2 = map3.selectAll('.state')
+            .data(parkIncOb, function(d){return d.state})
+            .enter()
+            .append('g')
+            .attr('class','state')
+            .call(attachTooltip);
+
+        nodes2
+            .append('circle')
+            .attr('class','circle')
+            .attr('transform', function(d){
+                return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+            })
+            .attr('r', 5)
+            .style('fill','#B74077');
 
         // need force layout 
          

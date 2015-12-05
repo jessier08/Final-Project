@@ -27,8 +27,9 @@ var scaleR = d3.scale.linear().domain([100000,6300000]).range([10,80]),
 queue()
 	.defer(d3.json, "data/states.json")
     .defer(d3.csv, "data/parkIncOb.csv", parseData)
-	.await(function(err, states, obesity){ 
+	.await(dataLoaded)
 
+function dataLoaded(err, states, parkIncOb){
         console.log(obByState);
 
         // var maxOb = d3.max(obesity);
@@ -57,95 +58,140 @@ queue()
         
         //filtering PR out of data
         data = data.filter(function(d){return d!=undefined});
-        
-		//enter exit update
-        var nodes = map.selectAll('state')
-            .data(data, function(d){return d.state})
+
+        d3.selectAll('.btn').on('click',function(){
+            var type = d3.select(this).attr('id');
+            
+            if (type=='scatterplot'){
+                draw(scatterplot);
+            } else if (type=='scaled'){
+                draw(scaled);
+            }
+            else {
+                draw(cartogram);
+            };
+        })
+}
+
+function draw(scaled){
+        map.append('g')
+            .attr('class','axis')
+            .attr('transform','translate(0,'+height+')')
+            .call(axisX);
+        map.append('g')
+            .attr('class','axis')
+            .call(axisY);
+
+        var nodes = map.selectAll('.state')
+            .data(obByState, function(d){return d.state})
             .enter()
             .append('g')
             .attr('class','state')
             .call(attachTooltip);
+
         nodes
             .append('circle')
             .attr('class','circle')
-            .attr('r',function(d){
-                var obese = (obByState.get(+d.state)).popObese;
+            .attr('transform', function(d){
+                return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+            })
+            .attr('r', function(d){
+                return scaleR(d.popObese);
+            })
+            .style('fill', function(d){
+                return scaleColor(d.pctObese)
+            })    
+}
+
+function draw(cartogram){
+    //enter exit update
+    var nodes = map.selectAll('state')
+        .data(obByState, function(d){return d.state})
+        .enter()
+        .append('g')
+        .attr('class','state')
+        .call(attachTooltip);
+    nodes
+        .append('circle')
+        .attr('class','circle')
+        .attr('r',function(d){
+            var obese = (obByState.get(+d.state)).popObese;
                 return scaleR(obese);
             })
-            .style('fill',function(d){
-                var pctOb = (obByState.get(+d.state)).pctObese;
-                return scaleColor(pctOb);
-            })
+        .style('fill',function(d){
+            var pctOb = (obByState.get(+d.state)).pctObese;
+            return scaleColor(pctOb);
+        })
+// text will be in tooltip
+    nodes
+        .append('text')
+        .attr('class','stateAbr')
+        .text(function(d){
+            return (obByState.get(+d.state)).abbr;
+        })
+        .attr('text-anchor','middle')
+        .attr('transform','translate('+0+','+4+')');
+    
+    //force layout
+    var force = d3.layout.force()
+        .size([width,height])
+        .charge(-20)
+        .gravity(0);
 
-        // text will be in tooltip
+    force.nodes(obByState)
+        .on('tick', onForceTick)
+        .start();
+
+    function onForceTick(e){
+        var q = d3.geom.quadtree(obByState),
+            i = 0,
+            n = obByState.length;
+
+        while( ++i<n ){
+            q.visit(collide(data[i]));
+        }
+
         nodes
-            .append('text')
-            .attr('class','stateAbr')
-            .text(function(d){
-                return (obByState.get(+d.state)).abbr;
+            .each(gravity(e.alpha*.05))
+            .attr('transform',function(d){
+                return 'translate('+d.x+','+d.y+')';
             })
-            .attr('text-anchor','middle')
-            .attr('transform','translate('+0+','+4+')');
 
-        //force layout
-        var force = d3.layout.force()
-            .size([width,height])
-            .charge(-20)
-            .gravity(0);
-
-        force.nodes(data)
-            .on('tick', onForceTick)
-            .start();
-
-        function onForceTick(e){
-            var q = d3.geom.quadtree(data),
-                i = 0,
-                n = data.length;
-
-            while( ++i<n ){
-                q.visit(collide(data[i]));
-            }
-
-            nodes
-                .each(gravity(e.alpha*.05))
-                .attr('transform',function(d){
-                        return 'translate('+d.x+','+d.y+')';
-                    })
-
-            function gravity(k){
-                return function(d){
-                    d.y += (d.y0 - d.y)*k;
-                    d.x += (d.x0 - d.x)*k;
-                }
-            }
-
-            function collide(dataPoint){
-                var nr = dataPoint.r + 5,
-                    nx1 = dataPoint.x - nr,
-                    ny1 = dataPoint.y - nr,
-                    nx2 = dataPoint.x + nr,
-                    ny2 = dataPoint.y + nr;
-
-                return function(quadPoint,x1,y1,x2,y2){
-                    if(quadPoint.point && (quadPoint.point !== dataPoint)){
-                        var x = dataPoint.x - quadPoint.point.x,
-                            y = dataPoint.y - quadPoint.point.y,
-                            l = Math.sqrt(x*x+y*y),
-                            r = nr + quadPoint.point.r;
-                        if(l<r){
-                            l = (l-r)/l*.1;
-                            dataPoint.x -= x*= (l*.05);
-                            dataPoint.y -= y*= l;
-                            quadPoint.point.x += (x*.05);
-                            quadPoint.point.y += y;
-                        }
-                    }
-                    return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
-                }
+        function gravity(k){
+            return function(d){
+                d.y += (d.y0 - d.y)*k;
+                d.x += (d.x0 - d.x)*k;
             }
         }
 
-        function attachTooltip(selection){
+        function collide(dataPoint){
+            var nr = dataPoint.r + 5,
+                nx1 = dataPoint.x - nr,
+                ny1 = dataPoint.y - nr,
+                nx2 = dataPoint.x + nr,
+                ny2 = dataPoint.y + nr;
+
+            return function(quadPoint,x1,y1,x2,y2){
+                if(quadPoint.point && (quadPoint.point !== dataPoint)){
+                    var x = dataPoint.x - quadPoint.point.x,
+                        y = dataPoint.y - quadPoint.point.y,
+                        l = Math.sqrt(x*x+y*y),
+                        r = nr + quadPoint.point.r;
+                    if(l<r){
+                        l = (l-r)/l*.1;
+                        dataPoint.x -= x*= (l*.05);
+                        dataPoint.y -= y*= l;
+                        quadPoint.point.x += (x*.05);
+                        quadPoint.point.y += y;
+                    }
+                }
+                return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
+            }
+        }
+    }
+} 
+
+function attachTooltip(selection){
         selection
             .on('mouseenter',function(d){
             var tooltip = d3.select('.custom-tooltip');
@@ -175,13 +221,8 @@ queue()
                 .transition()
                 .style('opacity',0);
             }) 
-        }  
-	});
-
-
-
-
-
+}  
+	
 function parseData(d){
     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
 
