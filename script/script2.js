@@ -46,6 +46,7 @@ queue()
 
         nodes
             .append('circle')
+            .attr('class','circle')
             .attr('transform', function(d){
                 return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
             })

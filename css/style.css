@@ -72,5 +72,8 @@ p, svg text{
     font-size:10px;
 }
 .circle {
+    stroke:white;
+    stroke-width:.5px;
     /*opacity: .8;*/
 }
+

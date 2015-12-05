@@ -19,8 +19,8 @@ var path = d3.geo.path()
 var obByState = d3.map();
 
 //Scales
-var scaleR = d3.scale.linear().domain([100000,6300000]).range([10,100]),
-    scaleColor = d3.scale.linear().domain([13,27]).range(['white','#81C219']);
+var scaleR = d3.scale.linear().domain([100000,6300000]).range([8,80]),
+    scaleColor = d3.scale.linear().domain([12,27]).range(['white','#B74077']);
 
 
 //import data
@@ -40,7 +40,7 @@ queue()
 
             //if a state is not in both data files, return nothing
             if(!obByState.get(+d.properties.STATE)){
-                console.log(d.properties.STATE + " not found");
+            //    console.log(d.properties.STATE + " not found");
                 return;
             }
 
@@ -59,7 +59,14 @@ queue()
         data = data.filter(function(d){return d!=undefined});
         
 		//enter exit update
-        var nodes = map.selectAll('.state')
+        // map.selectAll('state')
+        //     .data(states.features)
+        //     .enter()
+        //     .append('path')
+        //     .attr('d',path)
+        //     .attr('class','backMap');
+
+        var nodes = map.selectAll('state')
             .data(data, function(d){return d.state})
             .enter()
             .append('g')
@@ -90,7 +97,7 @@ queue()
         //force layout
         var force = d3.layout.force()
             .size([width,height])
-            .charge(-30)
+            .charge(-20)
             .gravity(0);
 
         force.nodes(data)
