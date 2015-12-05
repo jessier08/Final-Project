@@ -12,9 +12,7 @@ var map2 = d3.select('.canvas')
 //Set up projection and geo path generator
 
 var scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
-    scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]),
-    scaleR2 = d3.scale.linear().domain([100000,7000000]).range([5,80]);
-    scaleColor = d3.scale.linear().domain([15,35]).range(['white','#81C219']);
+    scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]);
 
 var axisX = d3.svg.axis()
     .orient('bottom')
@@ -52,12 +50,13 @@ queue()
                 return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
             })
             .attr('r', function(d){
-                return scaleR2(d.popObese);
+                return scaleR(d.popObese);
             })
             .style('fill', function(d){
                 return scaleColor(d.pctObese)
             })
 
+        // need force layout 
          
         function attachTooltip(selection){
         selection

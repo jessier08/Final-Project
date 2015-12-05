@@ -19,29 +19,26 @@ var path = d3.geo.path()
 var obByState = d3.map();
 
 //Scales
-var scaleR = d3.scale.sqrt().range([5,100]),
-    scaleColor = d3.scale.linear().domain([20,35]).range(['white','red']);
+var scaleR = d3.scale.linear().domain([100000,6300000]).range([10,100]),
+    scaleColor = d3.scale.linear().domain([13,27]).range(['white','#81C219']);
 
 
 //import data
 queue()
 	.defer(d3.json, "data/states.json")
-    .defer(d3.csv, "data/obese.csv", parseData)
+    .defer(d3.csv, "data/parkIncOb.csv", parseData)
 	.await(function(err, states, obesity){ 
 
-        console.log("Does it exist?");
         console.log(obByState);
 
-        var maxOb = d3.max(obesity);
-        scaleR.domain([0,maxOb.popObese]);
+        // var maxOb = d3.max(obesity);
+        // scaleR.domain([0,maxOb.popObese]);
 
-        console.log(maxOb.popObese);
-        console.log(obesity);
-        
         //construct a new array of data
         var data = states.features.map(function(d){
             var centroid = path.centroid(d);
 
+            //if a state is not in both data files, return nothing
             if(!obByState.get(+d.properties.STATE)){
                 console.log(d.properties.STATE + " not found");
                 return;
@@ -58,15 +55,19 @@ queue()
             }
         });
         
+        //filtering PR out of data
         data = data.filter(function(d){return d!=undefined});
         
-		var nodes = map.selectAll('.state')
+		//enter exit update
+        var nodes = map.selectAll('.state')
             .data(data, function(d){return d.state})
             .enter()
             .append('g')
-            .attr('class','state');
+            .attr('class','state')
+            .call(attachTooltip);
         nodes
             .append('circle')
+            .attr('class','circle')
             .attr('r',function(d){
                 var obese = (obByState.get(+d.state)).popObese;
                 return scaleR(obese);
@@ -75,21 +76,22 @@ queue()
                 var pctOb = (obByState.get(+d.state)).pctObese;
                 return scaleColor(pctOb);
             })
-            .style('fill-opacity',.7);
-        nodes
-            .append('text')
-            .text(function(d){
-                return d.stateName;
-            })
-            .attr('text-anchor','middle')
-            .attr('transform','translate('+0+','+4+')');
 
-        //TODO: create a force layout
-        //with what physical parameters?
+        // text will be in tooltip
+            
+        // nodes
+        //     .append('text')
+        //     .text(function(d){
+        //         return d.stateName;
+        //     })
+        //     .attr('text-anchor','middle')
+        //     .attr('transform','translate('+0+','+4+')');
+
+        //force layout
         var force = d3.layout.force()
             .size([width,height])
-            .charge(-40)
-            .gravity(.01);
+            .charge(-30)
+            .gravity(0);
 
         force.nodes(data)
             .on('tick', onForceTick)
@@ -142,6 +144,38 @@ queue()
                 }
             }
         }
+
+        function attachTooltip(selection){
+        selection
+            .on('mouseenter',function(d){
+            var tooltip = d3.select('.custom-tooltip');
+            
+            tooltip
+                .transition()
+                .style('opacity',1);
+           
+            tooltip.select('#name').html(d.name);
+            tooltip.select('#obese').html(d.pctObese);
+            tooltip.select('#park').html(d.pctPark); 
+            tooltip.select('#income').html(d.income); 
+            })
+
+            .on('mousemove',function(){
+            var xy = d3.mouse(map2.node());
+            
+            var tooltip = d3.select('.custom-tooltip');
+            
+            tooltip
+                .style('left',(d3.event.pageX+"px"))
+                .style('top',(d3.event.pageY+"px"))
+            })
+
+            .on('mouseleave',function(){
+            d3.select('.custom-tooltip')
+                .transition()
+                .style('opacity',0);
+            }) 
+        }  
 	});
 
 
@@ -153,15 +187,19 @@ function parseData(d){
 
     obByState.set(+d.STATE,{
         name: d.NAME,
-        state: +d.STATE,
-        popObese:+d.popObese,
-        pctObese:+d.pctObese
+        state: d.STATE,
+        pctPark: +d.pctPark,
+        income: +d.income,
+        popObese: +d.popObese,
+        pctObese: +d.pctObese
     });
 
     return {
         name: d.NAME,
-        state: +d.STATE,
-        popObese:+d.popObese,
-        pctObese:+d.pctObese
-    }
+        state: d.STATE,
+        pctPark: +d.pctPark,
+        income: +d.income,
+        popObese: +d.popObese,
+        pctObese: +d.pctObese
+    };
 }

@@ -54,8 +54,7 @@ p, svg text{
 
 .axis{
     font-size:.5em;
-    opacity: .5;
-    
+    opacity: .5; 
 }
 
 @font-face{
@@ -69,8 +68,9 @@ p, svg text{
     src:url("./fonts/maisonneue/MaisonNeueTRIAL-Demi.otf");
 }
 /*------------map-------------*/
-.state {
-    opacity: .8;
-    stroke:white;
-    stroke-width:1px;
+.state text{
+    font-size:10px;
+}
+.circle {
+    /*opacity: .8;*/
 }
