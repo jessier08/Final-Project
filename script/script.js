@@ -21,6 +21,7 @@ var obByState = d3.map();
 //Scales
 var scaleR = d3.scale.linear().domain([100000,6300000]).range([10,80]),
     scaleColor = d3.scale.linear().domain([12,27]).range(['white','#B74077']);
+    
 
 
 //import data
@@ -146,35 +147,35 @@ queue()
         }
 
         function attachTooltip(selection){
-        selection
-            .on('mouseenter',function(d){
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .transition()
-                .style('opacity',1);
-           
-            tooltip.select('#name').html(d.name);
-            tooltip.select('#obese').html(d.pctObese);
-            tooltip.select('#park').html(d.pctPark); 
-            tooltip.select('#income').html(d.income); 
-            })
+            selection
+                .on('mouseenter',function(d){
+                var tooltip = d3.select('.custom-tooltip');
+                
+                tooltip
+                    .transition()
+                    .style('opacity',1);
+               
+                tooltip.select('#name').html(d.name);
+                tooltip.select('#obese').html(d.pctObese);
+                tooltip.select('#park').html(d.pctPark); 
+                tooltip.select('#income').html(d.income); 
+                })
 
-            .on('mousemove',function(){
-            var xy = d3.mouse(map2.node());
-            
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .style('left',(d3.event.pageX+"px"))
-                .style('top',(d3.event.pageY+"px"))
-            })
+                .on('mousemove',function(){
+                var xy = d3.mouse(map.node());
+                
+                var tooltip = d3.select('.custom-tooltip');
+                
+                tooltip
+                    .style('left',(d3.event.pageX+"px"))
+                    .style('top',(d3.event.pageY+"px"))
+                })
 
-            .on('mouseleave',function(){
-            d3.select('.custom-tooltip')
-                .transition()
-                .style('opacity',0);
-            }) 
+                .on('mouseleave',function(){
+                d3.select('.custom-tooltip')
+                    .transition()
+                    .style('opacity',0);
+                }) 
         }  
 	});
 
