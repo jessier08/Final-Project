@@ -22,7 +22,7 @@ var obByState = d3.map();
 var centroidByState = d3.map();
 
 //Scales
-var scaleR = d3.scale.linear().domain([100000,6300000]).range([10,80]),
+var scaleR = d3.scale.linear().domain([100000,6300000]).range([8,80]),
     scaleColor = d3.scale.linear().domain([12,27]).range(['white','#B74077']),
     scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
     scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]);
@@ -118,13 +118,13 @@ function dataLoaded(err, states, obesity){
 
         if(selection == 'scatterplot'){
             nodes
-                .transition().duration(1000)
+                .transition()
                 .attr('r',5)
                 .style('fill','#B74077')
 
         } else if (selection == 'scaled') {
             nodes
-                .transition().duration(1000)
+                .transition().duration(400)
                 .attr('r', function(d){
                     return scaleR(d.popObese);
                 })
@@ -149,8 +149,8 @@ function dataLoaded(err, states, obesity){
             //force layout
             var force = d3.layout.force()
                 .size([width,height])
-                .charge(-20)
-                .gravity(0);
+                .charge(-30)
+                .gravity(.01);
            
             force.nodes(data)
                 .on('tick', onForceTick)
@@ -205,6 +205,7 @@ function dataLoaded(err, states, obesity){
                 }
 
             }
+            
 
         }
     
@@ -222,27 +223,34 @@ function attachTooltip(selection){
                 .transition()
                 .style('opacity',1);
            
-            tooltip.select('#name').html(d.name);
+            tooltip.select('#name').html(d.stateName);
             tooltip.select('#obese').html(d.pctObese);
             tooltip.select('#park').html(d.pctPark); 
             tooltip.select('#income').html(d.income); 
         })
 
-        .on('mousemove',function(){
-            var xy = d3.mouse(map.node());
-            
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .style('left',(d3.event.pageX+"px"))
-                .style('top',(d3.event.pageY+"px"))
-        })
-
         .on('mouseleave',function(){
             d3.select('.custom-tooltip')
-                .transition()
                 .style('opacity',0);
         }) 
+
+        .on('mouseover',function(){
+            var xy = d3.mouse(map.node());
+            
+            d3.select('.custom-tooltip')
+                .style('opacity',1)
+                .style('left', xy[0]+30+'px')
+                .style('top', xy[1]+30+'px');
+
+            
+            // var tooltip = d3.select('.custom-tooltip');
+            
+            // tooltip
+            //     .style('left',(d3.event.pageX+"px"))
+            //     .style('top',(d3.event.pageY+"px"))
+        })
+
+        
       
 }
 
