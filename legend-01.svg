@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 150 100" style="enable-background:new 0 0 150 100;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;stroke:#999999;stroke-width:0.5;stroke-miterlimit:10;}
+	.st1{fill:#FFFFFF;}
+	.st2{fill:url(#SVGID_1_);}
+	.st3{fill:#808285;}
+	.st4{font-family:'HelveticaNeue-Light';}
+	.st5{font-size:8px;}
+</style>
+<g>
+	<circle class="st0" cx="73.7" cy="70" r="58"/>
+	<circle class="st0" cx="73.7" cy="70" r="38.5"/>
+	<circle class="st0" cx="73.7" cy="70" r="15.7"/>
+	<rect x="11" y="70" class="st1" width="126.8" height="65.1"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="15.76" y1="79.9383" x2="131.7287" y2="79.9383">
+		<stop  offset="0" style="stop-color:#F3DEE7"/>
+		<stop  offset="1" style="stop-color:#B84077"/>
+	</linearGradient>
+	<rect x="15.8" y="74.1" class="st2" width="116" height="11.7"/>
+	<text transform="matrix(1 0 0 1 16.3491 95.8601)" class="st3 st4 st5">14%</text>
+	<text transform="matrix(1 0 0 1 116.3951 95.8598)" class="st3 st4 st5">27%</text>
+	<text transform="matrix(1 0 0 1 73.7441 51.435)" class="st3 st4 st5">500K</text>
+	<text transform="matrix(1 0 0 1 73.7442 28.8554)" class="st3 st4 st5">1M</text>
+	<text transform="matrix(1 0 0 1 73.7444 9.1289)" class="st3 st4 st5">5M</text>
+</g>
+</svg>

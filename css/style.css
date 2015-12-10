@@ -17,6 +17,7 @@ html,body{
     width:100%;
     background:white;
     height:700px;
+    margin-top:-20px;
 }
 .container .controls{
     margin-bottom:20px;
@@ -55,9 +56,9 @@ p, svg text{
     font-family:'MaisonNeue', sans-serif;
 }
 
-.axis{
-    font-size:.5em;
-    opacity: .5; 
+.axis text{
+    font-size:.7em;
+    color: rgb(180,180,180);
 }
 
 @font-face{
@@ -85,7 +86,6 @@ p, svg text{
 .state{
     stroke:white;
 }
-
 /*-----------buttons-------------*/
 .btn{
     width:250px;
@@ -103,3 +103,27 @@ p, svg text{
 button.selected{
     background-color:#E6E7E7; 
 }
+
+/*-----------legend-------------*/
+.legend{
+    width:150px;
+    min-height:150px;
+    position: absolute;
+    right:10%;
+    top:70%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -27,6 +27,20 @@ var scaleR = d3.scale.linear().domain([100000,6300000]).range([8,80]),
     scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
     scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]);
 
+var axisX = d3.svg.axis()
+    .orient('top')
+    .tickSize(-height,0)
+    .ticks(2)
+    .tickValues([0,100])
+    .scale(scaleX),
+
+    axisY = d3.svg.axis()
+    .orient('left')
+    .tickSize(-width,0)
+    .ticks(2)
+    .tickValues([0,80000])
+    .scale(scaleY);
+
 
 //import data
 queue()
@@ -37,9 +51,6 @@ queue()
 function dataLoaded(err, states, obesity){ 
 
     console.log(obByState);
-
-    // var maxOb = d3.max(obesity);
-    // scaleR.domain([0,maxOb.popObese]);
 
     //construct a new array of data
     var data = states.features.map(function(d){
@@ -83,9 +94,6 @@ function dataLoaded(err, states, obesity){
         })
     })
 
-    //filtering PR out of data
-    //data = data.filter(function(d){return d!=undefined});
-
     //enter exit update
     d3.selectAll('.btn').on('click', function(){
         $('button').on('click', function(){
@@ -121,7 +129,6 @@ function dataLoaded(err, states, obesity){
                 .transition()
                 .attr('r',5)
                 .style('fill','#B74077')
-
         } else if (selection == 'scaled') {
             nodes
                 .transition().duration(400)
@@ -241,13 +248,6 @@ function attachTooltip(selection){
                 .style('opacity',1)
                 .style('left', xy[0]+30+'px')
                 .style('top', xy[1]+30+'px');
-
-            
-            // var tooltip = d3.select('.custom-tooltip');
-            
-            // tooltip
-            //     .style('left',(d3.event.pageX+"px"))
-            //     .style('top',(d3.event.pageY+"px"))
         })
 
         
