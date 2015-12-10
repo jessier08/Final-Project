@@ -56,9 +56,8 @@ p, svg text{
     font-family:'MaisonNeue', sans-serif;
 }
 
-.axis text{
+.axis {
     font-size:.7em;
-    color: rgb(180,180,180);
 }
 
 @font-face{
@@ -106,11 +105,11 @@ button.selected{
 
 /*-----------legend-------------*/
 .legend{
-    width:150px;
+    width:180px;
     min-height:150px;
     position: absolute;
     right:10%;
-    top:70%;
+    top:80%;
 }
 
 

@@ -22,26 +22,23 @@ var scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
     scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]);
 
 var axisX = d3.svg.axis()
-    .orient('bottom')
-    .tickSize(-height,0)
-    .ticks(2)
-    .tickValues([0,100])
     .scale(scaleX);
 
 var axisY = d3.svg.axis()
-    .orient('left')
-    .tickSize(-width,0)
-    .ticks(2)
-    .tickValues([0,80000])
     .scale(scaleY);
 
 queue()
     .defer(d3.csv, "data/parkIncOb.csv", parse)
     .await(function(err,parkIncOb){
 
+        // var transform = d3.svg.transform()
+        //         // .translate(200, 100)
+        //         .rotate(-90);
+
+        
         map2.append('g')
             .attr('class','axis')
-            .attr('transform','translate(0,'+height+')')
+            .attr('transform','translate(-30,'+height+')')
             .append('text')
             .attr('text-anchor','right')
             .text('% of People Living Within 1/2 mile of a Park');
@@ -49,7 +46,8 @@ queue()
         map2.append('g')
             .attr('class','axis')
             .append('text')
-            .attr('transform','rotate(-90)')
+            .attr('text-anchor','right')
+            .attr('transform', 'translate(-30,550) rotate(-90)')
             .text('Income Per Capita');
 
         // console.log(parkIncOb);

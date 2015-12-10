@@ -2,7 +2,6 @@ var margin = {t:50,r:100,b:50,l:50};
 var width = document.getElementById('map').clientWidth - margin.r - margin.l,
     height = document.getElementById('map').clientHeight - margin.t - margin.b;
 
-
 var map = d3.select('.canvas')
     .append('svg')
     .attr('width',width+margin.r+margin.l)
@@ -41,7 +40,6 @@ var axisX = d3.svg.axis()
     .tickValues([0,80000])
     .scale(scaleY);
 
-
 //import data
 queue()
 	.defer(d3.json, "data/states.json")
@@ -55,7 +53,6 @@ function dataLoaded(err, states, obesity){
     //construct a new array of data
     var data = states.features.map(function(d){
         
-
         //if a state is not in both data files, return nothing
         if(!obByState.get(+d.properties.STATE)){return;
         } else {
@@ -129,6 +126,35 @@ function dataLoaded(err, states, obesity){
                 .transition()
                 .attr('r',5)
                 .style('fill','#B74077')
+
+            // axis labels
+            axis_label_dy = ['Income Per Capita']
+            axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
+
+            var axis_x = map.append('g')
+                .attr('class','axis')
+                .style('fill','rgb(180,180,180)')
+                .attr('transform','translate(30,'+height+')');
+            var axis_x_l = axis_x.selectAll('.axis-x')
+                .data(axis_label_dx)
+            var axis_x_l_enter = axis_x_l.enter()
+                .append('text').attr('class', 'axis-x')
+                .attr('text-anchor','right')   
+             var axis_x_l_exit = axis_x_l.exit().remove()
+             axis_x_l.text(function(d) {return d;})
+
+             var axis_y = map.append('g')
+                .attr('class','axis')
+                .style('fill','rgb(180,180,180)')
+                .attr('transform', 'translate(30,570) rotate(-90)');
+            var axis_y_l = axis_y.selectAll('.axis-y')
+                .data(axis_label_dy)
+            var axis_y_l_enter = axis_y_l.enter()
+                .append('text').attr('class', 'axis-y')
+                .attr('text-anchor','right')   
+            var axis_y_l_exit = axis_y_l.exit().remove()
+             axis_y_l.text(function(d) {return d;})
+
         } else if (selection == 'scaled') {
             nodes
                 .transition().duration(400)
@@ -140,7 +166,14 @@ function dataLoaded(err, states, obesity){
                 })
                 .style('stroke','white')
                 .style('stroke-width',.5)
+            
+            d3.select('.legend').append('img')
+                .attr('src','legend1.svg')
+
         }  else {
+            d3.select('.axis-x').text('')
+            d3.select('.axis-y').text('')
+
             nodes
                 .transition()
 
@@ -157,7 +190,7 @@ function dataLoaded(err, states, obesity){
             var force = d3.layout.force()
                 .size([width,height])
                 .charge(-30)
-                .gravity(.01);
+                .gravity(0);
            
             force.nodes(data)
                 .on('tick', onForceTick)
@@ -180,19 +213,16 @@ function dataLoaded(err, states, obesity){
 
                 function gravity(k){
                     return function(d){
-
                         d.y += (d.y0 - d.y)*k;
                         d.x += (d.x0 - d.x)*k;
                     }
                 }
-
                 function collide(dataPoint){
                     var nr = dataPoint.r + 5,
                         nx1 = dataPoint.x - nr,
                         ny1 = dataPoint.y - nr,
                         nx2 = dataPoint.x + nr,
                         ny2 = dataPoint.y + nr;
-
                     return function(quadPoint,x1,y1,x2,y2){
                         if(quadPoint.point && (quadPoint.point !== dataPoint)){
                             var x = dataPoint.x - quadPoint.point.x,
@@ -210,16 +240,10 @@ function dataLoaded(err, states, obesity){
                     return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
                     }
                 }
-
             }
-            
-
         }
-    
     })
 }
-        
-
 
 function attachTooltip(selection){
     selection
@@ -246,17 +270,10 @@ function attachTooltip(selection){
             
             d3.select('.custom-tooltip')
                 .style('opacity',1)
-                .style('left', xy[0]+30+'px')
-                .style('top', xy[1]+30+'px');
-        })
-
-        
-      
+                .style('left', xy[0]+60+'px')
+                .style('top', xy[1]+60+'px');
+        })    
 }
-
-
-
-
 
 function parseData(d){
     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
