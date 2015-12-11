@@ -100,6 +100,8 @@ function dataLoaded(err, states, obesity){
 
         var selection = d3.select(this).attr('id');
 
+        d3.select('.legend').style('opacity',1);
+
         //PR filter
         data = data.filter(function(d){return d!=undefined});
 
@@ -155,6 +157,8 @@ function dataLoaded(err, states, obesity){
             var axis_y_l_exit = axis_y_l.exit().remove()
              axis_y_l.text(function(d) {return d;})
 
+             d3.select('.legend').style('opacity',0);
+
         } else if (selection == 'scaled') {
             nodes
                 .transition().duration(400)
@@ -168,6 +172,7 @@ function dataLoaded(err, states, obesity){
                 .style('stroke-width',.5)
             
             d3.select('.legend').append('img')
+                .style('opacity',1)
                 .attr('src','legend1.svg')
 
         }  else {
