@@ -104,6 +104,35 @@ function dataLoaded(err, states, obesity){
         .append('img')
         .style('opacity',0)
         .attr('src','legend1.svg');
+    // axis labels
+            axis_label_dy = ['Income Per Capita']
+            axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
+
+            var axis_x = map.append('g')
+                .attr('class','axis')
+                .style('fill','rgb(180,180,180)')
+                .attr('transform','translate(30,'+height+')');
+            var axis_x_l = axis_x.selectAll('.axis-x')
+                .data(axis_label_dx);
+            var axis_x_l_enter = axis_x_l.enter()
+                .append('text').attr('class', 'axis-x')
+                .attr('text-anchor','right')
+                .style('opacity',0);   
+            var axis_x_l_exit = axis_x_l.exit().remove();
+            axis_x_l.text(function(d) {return d;})
+
+            var axis_y = map.append('g')
+                .attr('class','axis')
+                .style('fill','rgb(180,180,180)')
+                .attr('transform', 'translate(30,570) rotate(-90)');
+            var axis_y_l = axis_y.selectAll('.axis-y')
+                .data(axis_label_dy);
+            var axis_y_l_enter = axis_y_l.enter()
+                .append('text').attr('class', 'axis-y')
+                .attr('text-anchor','right') 
+                .style('opacity',0);   
+            var axis_y_l_exit = axis_y_l.exit().remove();
+            axis_y_l.text(function(d) {return d;});
 
     //appending state abbr labels
     var names = map.selectAll('.stateAbr')
@@ -158,34 +187,9 @@ function dataLoaded(err, states, obesity){
                 .style('fill','#B74077')
 
             legend.style('opacity',0);
+            axis_x_l_enter.style('opacity',1);
+            axis_y_l_enter.style('opacity',1);
 
-            // axis labels
-            axis_label_dy = ['Income Per Capita']
-            axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
-
-            var axis_x = map.append('g')
-                .attr('class','axis')
-                .style('fill','rgb(180,180,180)')
-                .attr('transform','translate(30,'+height+')');
-            var axis_x_l = axis_x.selectAll('.axis-x')
-                .data(axis_label_dx)
-            var axis_x_l_enter = axis_x_l.enter()
-                .append('text').attr('class', 'axis-x')
-                .attr('text-anchor','right')   
-            var axis_x_l_exit = axis_x_l.exit().remove()
-            axis_x_l.text(function(d) {return d;})
-
-            var axis_y = map.append('g')
-                .attr('class','axis')
-                .style('fill','rgb(180,180,180)')
-                .attr('transform', 'translate(30,570) rotate(-90)');
-            var axis_y_l = axis_y.selectAll('.axis-y')
-                .data(axis_label_dy)
-            var axis_y_l_enter = axis_y_l.enter()
-                .append('text').attr('class', 'axis-y')
-                .attr('text-anchor','right')   
-            var axis_y_l_exit = axis_y_l.exit().remove()
-            axis_y_l.text(function(d) {return d;})
 
         } else if (selection == 'scaled') {
             force.stop();
@@ -204,12 +208,10 @@ function dataLoaded(err, states, obesity){
                 .style('stroke-width',.5)
             
             legend.style('opacity',1);
+            axis_x_l_enter.style('opacity',1);
+            axis_y_l_enter.style('opacity',1);
 
         }  else {
-            d3.select('.axis-x').text('')
-            d3.select('.axis-y').text('')
-            legend.style('opacity',1);
-
             names
                 .text(function(d){
                     return (obByState.get(+d.state)).abbr;
@@ -219,6 +221,12 @@ function dataLoaded(err, states, obesity){
             force.nodes(obesity_)
                 .on('tick', onForceTick)
                 .start();
+
+            d3.select('.axis-x').text('')
+            d3.select('.axis-y').text('')
+            legend.style('opacity',1);
+            axis_x_l_enter.style('opacity',0);
+            axis_y_l_enter.style('opacity',0);
         }
     })
 
