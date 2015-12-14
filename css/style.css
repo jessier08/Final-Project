@@ -47,14 +47,19 @@ body{
 h1{ 
     font-size:2em;
     color:#B74077;
-}
-h2{ font-size:1.3em;}
-p, svg text{
     font-family:'MaisonNeue', sans-serif;
+}
+h2{ 
+    font-size:1.3em;
+    font-family:'MaisonNeue', sans-serif;
+}
+p, svg text{
+    /*font-family:'MaisonNeue', sans-serif;*/
 }
 
 .axis {
     font-size:.7em;
+    font-family: helvetica;
 }
 
 @font-face{
@@ -143,7 +148,10 @@ button.selected{
 .infoDivBottom p{
     font-size: .7em;
 }
-
+.hr{
+    border: 1px solid #B74077;
+    
+}
 
 
 

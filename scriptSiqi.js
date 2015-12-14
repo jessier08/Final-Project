@@ -1,7 +1,7 @@
 var margin = {t:50,r:100,b:50,l:50};
 var width = document.getElementById('map').clientWidth - margin.r - margin.l,
     height = document.getElementById('map').clientHeight - margin.t - margin.b;
-
+​
 var map = d3.select('.canvas')
     .append('svg')
     .attr('width',width+margin.r+margin.l)
@@ -9,52 +9,53 @@ var map = d3.select('.canvas')
     .append('g')
     .attr('class','map')
     .attr('transform','translate('+margin.l+','+margin.t+')');
-
+​
 //Set up projection and geo path generator
 var projection = d3.geo.albersUsa()
 	.translate([width/2, height/2]);
-
+​
 var path = d3.geo.path()
 	.projection(projection);
-
+​
 var obByState = d3.map();
 var centroidByState = d3.map();
-
+​
 //Scales
 var scaleR = d3.scale.linear().domain([100000,6300000]).range([8,80]),
     scaleColor = d3.scale.linear().domain([12,27]).range(['white','#B74077']),
     scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
     scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]);
-
+​
 var axisX = d3.svg.axis()
     .orient('top')
     .tickSize(-height,0)
     .ticks(2)
     .tickValues([0,100])
     .scale(scaleX),
-
+​
     axisY = d3.svg.axis()
     .orient('left')
     .tickSize(-width,0)
     .ticks(2)
     .tickValues([0,80000])
     .scale(scaleY);
-
+​
 var force = d3.layout.force()
     .size([width,height])
     .charge(-30)
     .gravity(0);
-
+​
+​
 //import data
 queue()
 	.defer(d3.json, "data/states.json")
     .defer(d3.csv, "data/parkIncOb.csv", parseData)
 	.await(dataLoaded);
-
+​
 function dataLoaded(err, states, obesity){ 
-
+​
     console.log(obByState);
-
+​
     //construct a new array of data
     var data = states.features.map(function(d){
         
@@ -63,8 +64,8 @@ function dataLoaded(err, states, obesity){
         } else {
         
             var centroid = path.centroid(d);
-
-            centroidByState.set(d.properties.NAME, centroid)
+​
+            centroidByState.set(d.properties.NAME, centroid);
                 return {
                     stateName:d.properties.NAME,
                     state:+d.properties.STATE,
@@ -76,9 +77,9 @@ function dataLoaded(err, states, obesity){
                 }
         }
     })
-
+​
     var obesity_ = [];
-
+​
     obesity.forEach(function(d){
         obesity_.push({
                 stateName:d.name,
@@ -95,74 +96,57 @@ function dataLoaded(err, states, obesity){
                 r:scaleR(d.popObese)
         })
     })
-
-    //PR filter
-    data = data.filter(function(d){return d!=undefined});
-
-    //legend
-    var legend = d3.select('.legend')
-        .append('img')
-        .style('opacity',0)
-        .attr('src','legend1.svg');
-
-    //appending state abbr labels
-    var names = map.selectAll('.stateAbr')
-        .data(obesity_, function(d){return d.state});
-
-    names
-        .enter()
-        .append('text')
-        .attr('class','stateAbr')
-        // .text(function(d){
-        //     return (obByState.get(+d.state)).abbr;
-        // })
-        .attr('text-anchor','middle')
-        .attr('transform','translate('+0+','+4+')');
-
-    names.exit()
-        .transition()
-        .remove();
-
-    //appending state circles
+​
     //enter exit update
-    var nodes = map.selectAll('.state')
-        .data(obesity_, function(d){return d.state});
-            
-    nodes
-        .append('circle')
-        .attr('class','state')
-        .attr('r',5)
-        .attr('transform', function(d){
-            return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
-        })
-        .style('fill','#B74077')
-        .call(attachTooltip);
-
-    nodes.exit()
-        .transition()
-        .remove();
-
-    //button selection
+    //SIQI: this part doesn't quite make sense: why do you have an event listener within another event listener?
     d3.selectAll('.btn').on('click', function(){
-
+        /*$('button').on('click', function(){
+            $('button').removeClass('selected');
+            $(this).addClass('selected');
+        })*/
+​
         var selection = d3.select(this).attr('id');
-
+​
+        d3.select('.legend').style('opacity',1);
+​
+        //PR filter
+        data = data.filter(function(d){return d!=undefined});
+​
+        var nodes = map.selectAll('.state')
+            .data(obesity_, function(d){return d.state})
+        
+        nodes
+            .enter()
+            .append('circle')
+            .attr('class','state')
+            .attr('r',5)
+            .attr('transform', function(d){
+                return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+            })
+            .style('fill','#B74077')
+            .call(attachTooltip);
+​
+        nodes.exit()
+            .transition()
+            .remove();
+​
         if(selection == 'scatterplot'){
+            //SIQI: to go from cartogram back to scatterplot, first stop the force layout
             force.stop();
-
-            names.text('')
-
+​
             nodes
                 .transition()
                 .attr('r',5)
                 .style('fill','#B74077')
-
-            legend.style('opacity',0);
-
+                .attr('transform', function(d){
+                    return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+                });
+​
+​
             // axis labels
             axis_label_dy = ['Income Per Capita']
             axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
-
+​
             var axis_x = map.append('g')
                 .attr('class','axis')
                 .style('fill','rgb(180,180,180)')
@@ -172,10 +156,10 @@ function dataLoaded(err, states, obesity){
             var axis_x_l_enter = axis_x_l.enter()
                 .append('text').attr('class', 'axis-x')
                 .attr('text-anchor','right')   
-            var axis_x_l_exit = axis_x_l.exit().remove()
-            axis_x_l.text(function(d) {return d;})
-
-            var axis_y = map.append('g')
+             var axis_x_l_exit = axis_x_l.exit().remove()
+             axis_x_l.text(function(d) {return d;})
+​
+             var axis_y = map.append('g')
                 .attr('class','axis')
                 .style('fill','rgb(180,180,180)')
                 .attr('transform', 'translate(30,570) rotate(-90)');
@@ -185,13 +169,14 @@ function dataLoaded(err, states, obesity){
                 .append('text').attr('class', 'axis-y')
                 .attr('text-anchor','right')   
             var axis_y_l_exit = axis_y_l.exit().remove()
-            axis_y_l.text(function(d) {return d;})
-
+             axis_y_l.text(function(d) {return d;})
+​
+             d3.select('.legend').style('opacity',0);
+​
         } else if (selection == 'scaled') {
+            //SIQI: to go from cartogram back to scatterplot, first stop the force layout
             force.stop();
-
-            names.text('')
-
+​
             nodes
                 .transition().duration(400)
                 .attr('r', function(d){
@@ -202,76 +187,101 @@ function dataLoaded(err, states, obesity){
                 })
                 .style('stroke','white')
                 .style('stroke-width',.5)
-            
-            legend.style('opacity',1);
-
+                //SIQI: to go from cartogram back to scatterplot, you need to transition node back to scatterplot space
+                .attr('transform', function(d){
+                    return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+                });
+​
+            //SIQI: this is also a problem: every time someone selects #scaled, you append <img>
+            //This will result in multiple legends being appended
+            d3.select('.legend').append('img')
+                .style('opacity',1)
+                .attr('src','legend1.svg')
+​
         }  else {
             d3.select('.axis-x').text('')
             d3.select('.axis-y').text('')
-            legend.style('opacity',1);
-
-            names
+​
+            /*
+            nodes
+                .transition()*/
+​
+            //SIQI: this block doesn't work, because "nodes" is a collection of <circle> elements
+            //and you can't append <text> underneath <circle>
+            //also, you are appending <text> every time a user clicks on the menu
+            //this will result in multiple text labels being appended
+            /*
+            nodes
+                .append('text')
+                .attr('class','stateAbr')
                 .text(function(d){
                     return (obByState.get(+d.state)).abbr;
                 })
-
+                .attr('text-anchor','middle')
+                .attr('transform','translate('+0+','+4+')');*/
+​
             //force layout
+            //SIQI: again, remember that this function block will be called multiple times
+            //so you should move the definition for the force layout to the outside
+            //lest you create multiple instances of the same layout
+            /*var force = d3.layout.force()
+                .size([width,height])
+                .charge(-30)
+                .gravity(0);*/
+           
             force.nodes(obesity_)
                 .on('tick', onForceTick)
                 .start();
+​
+            function onForceTick(e){
+                var q = d3.geom.quadtree(data),
+                    i = 0,
+                    n = data.length;
+​
+                while( ++i<n ){
+                    q.visit(collide(data[i]));
+                }
+​
+                nodes
+                    .each(gravity(e.alpha*.05))
+                    .attr('transform',function(d){
+                        return 'translate('+d.x+','+d.y+')';
+                    })
+​
+                function gravity(k){
+                    return function(d){
+                        d.y += (d.y0 - d.y)*k;
+                        d.x += (d.x0 - d.x)*k;
+                    }
+                }
+                function collide(dataPoint){
+                    var nr = dataPoint.r + 5,
+                        nx1 = dataPoint.x - nr,
+                        ny1 = dataPoint.y - nr,
+                        nx2 = dataPoint.x + nr,
+                        ny2 = dataPoint.y + nr;
+                    return function(quadPoint,x1,y1,x2,y2){
+                        if(quadPoint.point && (quadPoint.point !== dataPoint)){
+                            var x = dataPoint.x - quadPoint.point.x,
+                                y = dataPoint.y - quadPoint.point.y,
+                                l = Math.sqrt(x*x+y*y),
+                                r = nr + quadPoint.point.r;
+                            if(l<r){
+                                l = (l-r)/l*.1;
+                                dataPoint.x -= x*= (l*.05);
+                                dataPoint.y -= y*= l;
+                                quadPoint.point.x += (x*.05);
+                                quadPoint.point.y += y;
+                            }
+                        }
+                    return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
+                    }
+                }
+            }
         }
     })
-
-    function onForceTick(e){
-        var q = d3.geom.quadtree(obesity_),
-            i = 0,
-            n = obesity_.length;
-
-        while( ++i<n ){
-            q.visit(collide(obesity_[i]));
-        }
-
-        nodes
-            .each(gravity(e.alpha*.05))
-            .attr('transform',function(d){
-                return 'translate('+d.x+','+d.y+')';
-            })
-
-        function gravity(k){
-            return function(d){
-                d.y += (d.y0 - d.y)*k;
-                d.x += (d.x0 - d.x)*k;
-            }
-        }
-        function collide(dataPoint){
-            var nr = dataPoint.r + 5,
-                nx1 = dataPoint.x - nr,
-                ny1 = dataPoint.y - nr,
-                nx2 = dataPoint.x + nr,
-                ny2 = dataPoint.y + nr;
-            return function(quadPoint,x1,y1,x2,y2){
-                if(quadPoint.point && (quadPoint.point !== dataPoint)){
-                    var x = dataPoint.x - quadPoint.point.x,
-                        y = dataPoint.y - quadPoint.point.y,
-                        l = Math.sqrt(x*x+y*y),
-                        r = nr + quadPoint.point.r;
-                        if(l<r){
-                            l = (l-r)/l*.1;
-                            dataPoint.x -= x*= (l*.05);
-                            dataPoint.y -= y*= l;
-                            quadPoint.point.x += (x*.05);
-                            quadPoint.point.y += y;
-                        }
-                    }
-                    return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
-            }
-        }
-    }
-
 }
-
-
-
+​
 function attachTooltip(selection){
     selection
         .on('mouseenter',function(d){
@@ -286,12 +296,12 @@ function attachTooltip(selection){
             tooltip.select('#park').html(d.pctPark); 
             tooltip.select('#income').html(d.income); 
         })
-
+​
         .on('mouseleave',function(){
             d3.select('.custom-tooltip')
                 .style('opacity',0);
         }) 
-
+​
         .on('mouseover',function(){
             var xy = d3.mouse(map.node());
             
@@ -301,10 +311,10 @@ function attachTooltip(selection){
                 .style('top', xy[1]+60+'px');
         })    
 }
-
+​
 function parseData(d){
     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
-
+​
     obByState.set(+d.STATE,{
         name: d.NAME,
         state: d.STATE,
@@ -314,7 +324,7 @@ function parseData(d){
         pctObese: +d.pctObese,
         abbr: d.ABR
     })
-
+​
     return {
         name: d.NAME,
         state: d.STATE,
@@ -325,3 +335,4 @@ function parseData(d){
         abbr: d.ABR
     };
 }
+Add Comment
