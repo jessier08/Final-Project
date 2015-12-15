@@ -40,6 +40,7 @@ var axisX = d3.svg.axis()
     .tickValues([0,80000])
     .scale(scaleY);
 
+//force
 var force = d3.layout.force()
     .size([width,height])
     .charge(-30)
@@ -53,7 +54,7 @@ queue()
 
 function dataLoaded(err, states, obesity){ 
 
-    console.log(obByState);
+    // console.log(obByState);
 
     //construct a new array of data
     var data = states.features.map(function(d){
@@ -72,71 +73,81 @@ function dataLoaded(err, states, obesity){
                     y0:centroid[1],
                     x:centroid[0],
                     y:centroid[1],
-                    r:scaleR((obByState.get(+d.properties.STATE).popObese))
+                    r:scaleR((obByState.get(+d.properties.STATE).popObese)),
+                    pctObese: ((obByState.get(+d.properties.STATE).pctObese)),
+                    pctPark: ((obByState.get(+d.properties.STATE).pctPark)),
+                    popObese: ((obByState.get(+d.properties.STATE).popObese)),
+                    abbr: ((obByState.get(+d.properties.STATE).abbr)),
+                    income: ((obByState.get(+d.properties.STATE).income))
                 }
         }
     })
 
-    var obesity_ = [];
+    // var obesity_ = [];
 
-    obesity.forEach(function(d){
-        obesity_.push({
-                stateName:d.name,
-                state:+d.state,
-                pctObese: +d.pctObese,
-                pctPark: +d.pctPark,
-                popObese: +d.popObese,
-                abbr: +d.abbr,
-                income: +d.income,
-                x0:centroidByState.get(d.name)[0],
-                y0:centroidByState.get(d.name)[1],
-                x:centroidByState.get(d.name)[1],
-                y:centroidByState.get(d.name)[0],
-                r:scaleR(d.popObese)
-        })
-    })
+    // obesity.forEach(function(d){
+    //     obesity_.push({
+    //             stateName:d.name,
+    //             state:+d.state,
+    //             pctObese: +d.pctObese,
+    //             pctPark: +d.pctPark,
+    //             popObese: +d.popObese,
+    //             abbr: +d.abbr,
+    //             income: +d.income,
+    //             x0:centroidByState.get(d.name)[0],
+    //             y0:centroidByState.get(d.name)[1],
+    //             x:centroidByState.get(d.name)[1],
+    //             y:centroidByState.get(d.name)[0],
+    //             r:scaleR(d.popObese)
+    //     })
+    // })
+
+    // console.log(obesity_);
 
     //PR filter
     data = data.filter(function(d){return d!=undefined});
+
+    console.log(data);
 
     //legend
     var legend = d3.select('.legend')
         .append('img')
         .style('opacity',0)
         .attr('src','legend1.svg');
+
     // axis labels
-            axis_label_dy = ['Income Per Capita']
-            axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
+    axis_label_dy = ['Income Per Capita']
+    axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
 
-            var axis_x = map.append('g')
-                .attr('class','axis')
-                .style('fill','rgb(180,180,180)')
-                .attr('transform','translate(30,'+height+')');
-            var axis_x_l = axis_x.selectAll('.axis-x')
-                .data(axis_label_dx);
-            var axis_x_l_enter = axis_x_l.enter()
-                .append('text').attr('class', 'axis-x')
-                .attr('text-anchor','right')
-                .style('opacity',0);   
-            var axis_x_l_exit = axis_x_l.exit().remove();
-            axis_x_l.text(function(d) {return d;})
+    var axis_x = map.append('g')
+        .attr('class','axis')
+        .style('fill','rgb(180,180,180)')
+        .attr('transform','translate(30,'+height+')');
+    var axis_x_l = axis_x.selectAll('.axis-x')
+        .data(axis_label_dx);
+    var axis_x_l_enter = axis_x_l.enter()
+        .append('text').attr('class', 'axis-x')
+        .attr('text-anchor','right')
+        .style('opacity',0);   
+    var axis_x_l_exit = axis_x_l.exit().remove();
+        axis_x_l.text(function(d) {return d;})
 
-            var axis_y = map.append('g')
-                .attr('class','axis')
-                .style('fill','rgb(180,180,180)')
-                .attr('transform', 'translate(30,570) rotate(-90)');
-            var axis_y_l = axis_y.selectAll('.axis-y')
-                .data(axis_label_dy);
-            var axis_y_l_enter = axis_y_l.enter()
-                .append('text').attr('class', 'axis-y')
-                .attr('text-anchor','right') 
-                .style('opacity',0);   
-            var axis_y_l_exit = axis_y_l.exit().remove();
-            axis_y_l.text(function(d) {return d;});
+    var axis_y = map.append('g')
+        .attr('class','axis')
+        .style('fill','rgb(180,180,180)')
+        .attr('transform', 'translate(30,570) rotate(-90)');
+    var axis_y_l = axis_y.selectAll('.axis-y')
+        .data(axis_label_dy);
+    var axis_y_l_enter = axis_y_l.enter()
+        .append('text').attr('class', 'axis-y')
+        .attr('text-anchor','right') 
+        .style('opacity',0);   
+    var axis_y_l_exit = axis_y_l.exit().remove();
+        axis_y_l.text(function(d) {return d;});
 
     //appending state abbr labels
     var names = map.selectAll('.stateAbr')
-        .data(obesity_, function(d){return d.state});
+        .data(data, function(d){return d.state});
 
     names
         .enter()
@@ -155,7 +166,7 @@ function dataLoaded(err, states, obesity){
     //appending state circles
     //enter exit update
     var nodes = map.selectAll('.state')
-        .data(obesity_, function(d){return d.state});
+        .data(data, function(d){return d.state});
             
     nodes
         .append('circle')
@@ -218,7 +229,7 @@ function dataLoaded(err, states, obesity){
                 })
 
             //force layout
-            force.nodes(obesity_)
+            force.nodes(data)
                 .on('tick', onForceTick)
                 .start();
 
@@ -231,12 +242,12 @@ function dataLoaded(err, states, obesity){
     })
 
     function onForceTick(e){
-        var q = d3.geom.quadtree(obesity_),
+        var q = d3.geom.quadtree(data),
             i = 0,
-            n = obesity_.length;
+            n = data.length;
 
         while( ++i<n ){
-            q.visit(collide(obesity_[i]));
+            q.visit(collide(data[i]));
         }
 
         nodes
