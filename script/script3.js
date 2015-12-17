@@ -46,6 +46,44 @@ var force = d3.layout.force()
     .charge(-30)
     .gravity(0);
 
+
+
+//legend
+var legend = d3.select('.legend')
+    .append('img')
+    .style('opacity',0)
+    .attr('src','legend1.svg');
+
+// axis labels
+axis_label_dy = ['Income Per Capita']
+axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
+
+var axis_x = map.append('g')
+    .attr('class','axis')
+    .style('fill','rgb(180,180,180)')
+    .attr('transform','translate(30,'+height+')');
+var axis_x_l = axis_x.selectAll('.axis-x')
+    .data(axis_label_dx);
+var axis_x_l_enter = axis_x_l.enter()
+    .append('text').attr('class', 'axis-x')
+    .attr('text-anchor','right')
+    .style('opacity',0);   
+var axis_x_l_exit = axis_x_l.exit().remove();
+    axis_x_l.text(function(d) {return d;})
+
+var axis_y = map.append('g')
+    .attr('class','axis')
+    .style('fill','rgb(180,180,180)')
+    .attr('transform', 'translate(30,570) rotate(-90)');
+var axis_y_l = axis_y.selectAll('.axis-y')
+    .data(axis_label_dy);
+var axis_y_l_enter = axis_y_l.enter()
+    .append('text').attr('class', 'axis-y')
+    .attr('text-anchor','right') 
+    .style('opacity',0);   
+var axis_y_l_exit = axis_y_l.exit().remove();
+    axis_y_l.text(function(d) {return d;});
+
 //import data
 queue()
 	.defer(d3.json, "data/states.json")
@@ -53,16 +91,13 @@ queue()
 	.await(dataLoaded);
 
 function dataLoaded(err, states, obesity){ 
-
-    // console.log(obByState);
-
-    //construct a new array of data
+    //create data 
     var data = states.features.map(function(d){
         
-        //if a state is not in both data files, return nothing
+    //if a state is not in both data files, return nothing
         if(!obByState.get(+d.properties.STATE)){return;
         } else {
-        
+
             var centroid = path.centroid(d);
 
             centroidByState.set(d.properties.NAME, centroid)
@@ -82,68 +117,11 @@ function dataLoaded(err, states, obesity){
                 }
         }
     })
-
-    // var obesity_ = [];
-
-    // obesity.forEach(function(d){
-    //     obesity_.push({
-    //             stateName:d.name,
-    //             state:+d.state,
-    //             pctObese: +d.pctObese,
-    //             pctPark: +d.pctPark,
-    //             popObese: +d.popObese,
-    //             abbr: +d.abbr,
-    //             income: +d.income,
-    //             x0:centroidByState.get(d.name)[0],
-    //             y0:centroidByState.get(d.name)[1],
-    //             x:centroidByState.get(d.name)[1],
-    //             y:centroidByState.get(d.name)[0],
-    //             r:scaleR(d.popObese)
-    //     })
-    // })
-
-    // console.log(obesity_);
-
+    
     //PR filter
     data = data.filter(function(d){return d!=undefined});
 
     console.log(data);
-
-    //legend
-    var legend = d3.select('.legend')
-        .append('img')
-        .style('opacity',0)
-        .attr('src','legend1.svg');
-
-    // axis labels
-    axis_label_dy = ['Income Per Capita']
-    axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
-
-    var axis_x = map.append('g')
-        .attr('class','axis')
-        .style('fill','rgb(180,180,180)')
-        .attr('transform','translate(30,'+height+')');
-    var axis_x_l = axis_x.selectAll('.axis-x')
-        .data(axis_label_dx);
-    var axis_x_l_enter = axis_x_l.enter()
-        .append('text').attr('class', 'axis-x')
-        .attr('text-anchor','right')
-        .style('opacity',0);   
-    var axis_x_l_exit = axis_x_l.exit().remove();
-        axis_x_l.text(function(d) {return d;})
-
-    var axis_y = map.append('g')
-        .attr('class','axis')
-        .style('fill','rgb(180,180,180)')
-        .attr('transform', 'translate(30,570) rotate(-90)');
-    var axis_y_l = axis_y.selectAll('.axis-y')
-        .data(axis_label_dy);
-    var axis_y_l_enter = axis_y_l.enter()
-        .append('text').attr('class', 'axis-y')
-        .attr('text-anchor','right') 
-        .style('opacity',0);   
-    var axis_y_l_exit = axis_y_l.exit().remove();
-        axis_y_l.text(function(d) {return d;});
 
     //appending state abbr labels
     var names = map.selectAll('.stateAbr')
@@ -163,10 +141,12 @@ function dataLoaded(err, states, obesity){
         .transition()
         .remove();
 
-    //appending state circles
-    //enter exit update
+    //node selection
     var nodes = map.selectAll('.state')
         .data(data, function(d){return d.state});
+
+    //appending state circles
+    //enter exit update
             
     nodes
         .append('circle')
@@ -215,7 +195,6 @@ function dataLoaded(err, states, obesity){
                 .style('fill', function(d){
                     return scaleColor(d.pctObese)
                 })
-                .style('stroke','white')
                 .style('stroke-width',.5)
             
             legend.style('opacity',1);
