@@ -71,7 +71,7 @@ queue()
     .defer(d3.csv, "data/parkIncOb.csv", parseData)
 	.await(dataLoaded);
 
-//all drawing in here
+//data joining & drawing in here
 function dataLoaded(err, states, obesity){
         //construct a new array of data
         var data = states.features.map(function(d){
@@ -102,7 +102,7 @@ function dataLoaded(err, states, obesity){
         //PR filter
         data = data.filter(function(d){return d!=undefined});
         
-        //plot circles from greatest to least
+        //sort to plot circles from greatest to least
         data = data.sort(function(a, b){return d3.descending(a.popObese, b.popObese)});
 
         console.log(data);
@@ -163,7 +163,7 @@ function dataLoaded(err, states, obesity){
                 force.stop();
                 
                 nodes
-                    .transition().duration(500)
+                    .transition().duration(1000)
                     .attr('r', function(d){
                         return scaleR(d.popObese);
                     })
@@ -181,7 +181,7 @@ function dataLoaded(err, states, obesity){
             } 
             else {
                 nodes
-                    .transition().duration(500)
+                    .transition().duration(1000)
                 
                 force.nodes(data)
                     .on('tick', onForceTick)
@@ -245,39 +245,36 @@ function dataLoaded(err, states, obesity){
     function attachTooltip(selection){
         selection
             .on('mouseenter',function(d){
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .transition()
-                .style('opacity',1);
-           
-            tooltip.select('#name').html(d.stateName);
-            tooltip.select('#obese').html(d.pctObese);
-            tooltip.select('#park').html(d.pctPark); 
-            tooltip.select('#income').html(d.income); 
-            })
+                var tooltip = d3.select('.custom-tooltip');
+                
+                tooltip
+                    .transition()
+                    .style('opacity',1);
+               
+                tooltip.select('#name').html(d.stateName);
+                tooltip.select('#obese').html(d.pctObese);
+                tooltip.select('#park').html(d.pctPark); 
+                tooltip.select('#income').html(d.income); 
+                })
 
             .on('mousemove',function(){
-            var xy = d3.mouse(map.node());
-            
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .style('left',(d3.event.pageX+"px"))
-                .style('top',(d3.event.pageY+"px"))
-            })
+                var tooltip = d3.select('.custom-tooltip');
+                
+                tooltip
+                    .style('left',(d3.event.pageX+"px"))
+                    .style('top',(d3.event.pageY+"px"))
+                })
 
             .on('mouseleave',function(){
-            d3.select('.custom-tooltip')
-                .transition()
-                .style('opacity',0);
-            }) 
+                d3.select('.custom-tooltip')
+                    .transition()
+                    .style('opacity',0);
+                }) 
     }         
 }	
 
 
 function parseData(d){
-    //Use the parse function to populate the lookup table of states and their populations/% pop 18+
 
     obByState.set(+d.STATE,{
         name: d.NAME,

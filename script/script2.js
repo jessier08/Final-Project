@@ -2,250 +2,292 @@ var margin = {t:50,l:50,b:50,r:50},
     width = document.getElementById('map').clientWidth-margin.l-margin.r,
     height = document.getElementById('map').clientHeight-margin.t-margin.b;
 
-var map2 = d3.select('.canvas')
+var map = d3.select('.canvas')
     .append('svg')
     .attr('width',width+margin.l+margin.r)
     .attr('height',height+margin.t+margin.b)
-    .append('g')
-    .attr('transform',"translate("+margin.l+","+margin.t+")");
-
-var map3 = d3.select('.canvas')
-    .append('svg')
-    .attr('width',width+margin.l+margin.r)
-    .attr('height',height+margin.t+margin.b)
-    .append('g')
+    .append('g').attr('class','map')
     .attr('transform',"translate("+margin.l+","+margin.t+")");
 
 //Set up projection and geo path generator
+var projection = d3.geo.albersUsa()
+	.translate([width/2, height/2]);
 
-var scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
+var path = d3.geo.path()
+	.projection(projection);
+
+var obByState = d3.map();
+var centroidByState = d3.map();
+
+//Scales
+var scaleR = d3.scale.linear().domain([500000,40000000]).range([8,80]),
+    scaleColor = d3.scale.linear().domain([12,27]).range(['white','#B74077']),
+    scaleX = d3.scale.linear().domain([0,90]).range([0,width]),
     scaleY = d3.scale.linear().domain([30000,70000]).range([height,0]);
+    
+//force layout
+var force = d3.layout.force()
+    .size([width,height])
+    .charge(-40)
+    .gravity(0);
 
-var axisX = d3.svg.axis()
-    .scale(scaleX);
+//legend
+var legend = d3.select('.legend')
+    .append('img')
+    .style('opacity',0)
+    .attr('src','legend1.svg');
 
-var axisY = d3.svg.axis()
-    .scale(scaleY);
-
-queue()
-    .defer(d3.csv, "data/parkIncOb.csv", parse)
-    .await(function(err,parkIncOb){
-
-        // var transform = d3.svg.transform()
-        //         // .translate(200, 100)
-        //         .rotate(-90);
-
-        
-        map2.append('g')
-            .attr('class','axis')
-            .attr('transform','translate(-30,'+height+')')
-            .append('text')
-            .attr('text-anchor','right')
-            .text('% of People Living Within 1/2 mile of a Park');
-
-        map2.append('g')
-            .attr('class','axis')
-            .append('text')
-            .attr('text-anchor','right')
-            .attr('transform', 'translate(-30,550) rotate(-90)')
-            .text('Income Per Capita');
-
-        // console.log(parkIncOb);
-
-        //scaled scatterplot
-        var nodes = map2.selectAll('.state')
-            .data(parkIncOb, function(d){return d.state})
-            .enter()
-            .append('g')
-            .attr('class','state')
-            .call(attachTooltip);
-
-        nodes
-            .append('circle')
-            .attr('class','circle')
-            .attr('transform', function(d){
-                return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
-            })
-            .attr('r', function(d){
-                return scaleR(d.popObese);
-            })
-            .style('fill', function(d){
-                return scaleColor(d.pctObese)
-            })
-
-        //scatterplot
-        var nodes2 = map3.selectAll('.state')
-            .data(parkIncOb, function(d){return d.state})
-            .enter()
-            .append('g')
-            .attr('class','state')
-            .call(attachTooltip);
-
-        nodes2
-            .append('circle')
-            .attr('class','circle')
-            .attr('transform', function(d){
-                return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
-            })
-            .attr('r', 5)
-            .style('fill','#B74077');
-
-        // need force layout 
-         
-        function attachTooltip(selection){
-        selection
-            .on('mouseenter',function(d){
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .transition()
-                .style('opacity',1);
-           
-            tooltip.select('#name').html(d.name);
-            tooltip.select('#obese').html(d.pctObese);
-            tooltip.select('#park').html(d.pctPark); 
-            tooltip.select('#income').html(d.income); 
-            })
-
-            .on('mousemove',function(){
-            var xy = d3.mouse(map2.node());
-            
-            var tooltip = d3.select('.custom-tooltip');
-            
-            tooltip
-                .style('left',(d3.event.pageX+"px"))
-                .style('top',(d3.event.pageY+"px"))
-            })
-
-            .on('mouseleave',function(){
-            d3.select('.custom-tooltip')
-                .transition()
-                .style('opacity',0);
-            }) 
-        }  
-    })
-
-
-
-
+// axis labels
+axis_label_dy = ['Income Per Capita']
+axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
+var axis_x = map.append('g')
+    .attr('class','axis')
+    .style('fill','rgb(180,180,180)')
+    .attr('transform','translate(30,'+height+')');
+var axis_x_l = axis_x.selectAll('.axis-x')
+    .data(axis_label_dx);
+var axis_x_l_enter = axis_x_l.enter()
+    .append('text').attr('class', 'axis-x')
+    .attr('text-anchor','right')
+    .style('opacity',0);   
+var axis_x_l_exit = axis_x_l.exit().remove();
+    axis_x_l.text(function(d) {return d;})
+var axis_y = map.append('g')
+    .attr('class','axis')
+    .style('fill','rgb(180,180,180)')
+    .attr('transform', 'translate(30,570) rotate(-90)');
+var axis_y_l = axis_y.selectAll('.axis-y')
+    .data(axis_label_dy);
+var axis_y_l_enter = axis_y_l.enter()
+    .append('text').attr('class', 'axis-y')
+    .attr('text-anchor','right') 
+    .style('opacity',0);   
+var axis_y_l_exit = axis_y_l.exit().remove();
+    axis_y_l.text(function(d) {return d;});
 
 //import data
-// queue()
-// 	.defer(d3.json, "data/states.json")
-//     .defer(d3.csv, "data/obese.csv", parseData)
-// 	.await(function(err, states, obesity){ 
+queue()
+	.defer(d3.json, "data/states.json")
+    .defer(d3.csv, "data/parkIncOb.csv", parseData)
+	.await(dataLoaded);
 
-//         var maxOb = d3.max(obesity);
-//         scaleR.domain([0,maxOb.popObese]);
+//all drawing in here
+function dataLoaded(err, states, obesity){
+        //construct a new array of data
+        var data = states.features.map(function(d){
+            //if a state is not in both data files, return nothing
+            if(!obByState.get(+d.properties.STATE)){return;
+            } 
+            else {
+                var centroid = path.centroid(d);
 
-//         console.log(maxOb.popObese);
+                centroidByState.set(d.properties.NAME, centroid)
+                    return {
+                        stateName:d.properties.NAME,
+                        state:+d.properties.STATE,
+                        x0:centroid[0],
+                        y0:centroid[1],
+                        x:centroid[0],
+                        y:centroid[1],
+                        r:scaleR((obByState.get(+d.properties.STATE).popObese)),
+                        pctObese: ((obByState.get(+d.properties.STATE).pctObese)),
+                        pctPark: ((obByState.get(+d.properties.STATE).pctPark)),
+                        popObese: ((obByState.get(+d.properties.STATE).popObese)),
+                        abbr: ((obByState.get(+d.properties.STATE).abbr)),
+                        income: ((obByState.get(+d.properties.STATE).income)),
+                        pop: ((obByState.get(+d.properties.STATE).pop))
+                    }
+            }
+        }),
 
-//         //construct a new array of data
-//         var data = states.features.map(function(d){
-//             var centroid = path.centroid(d);
-
-//             return {
-//                 stateName:d.properties.NAME,
-//                 state:d.properties.STATE,
-//                 x0:centroid[0],
-//                 y0:centroid[1],
-//                 x:centroid[0],
-//                 y:centroid[1],
-//                 //r:scaleR((obByState.get(d.properties.STATE).obesity))
-//             }
-//         });
+        //PR filter
+        data = data.filter(function(d){return d!=undefined});
         
-//         console.log(data);
+        //plot circles from greatest to least
+        data = data.sort(function(a, b){return d3.descending(a.pop, b.pop)});
 
-// 		var nodes = map.selectAll('.state')
-//             .data(data, function(d){return d.state})
-//             .enter()
-//             .append('g')
-//             .attr('class','state');
-//         nodes
-//             .append('circle')
-//             .attr('r',function(d){
-//                 var obese = NEED TO ACCESS POPOBESE
+        console.log(data);
 
-//                 return scaleR(obese);
-//             })
-//             .style('fill',function(d){
-//                 var pctOb = (obByState.get(d.state)).pctObese;
-//                 return scaleColor(pctOb);
-//             })
-//             .style('fill-opacity',.7);
-//         nodes
-//             .append('text')
-//             .text(function(d){
-//                 return d.stateName;
-//             })
-//             .attr('text-anchor','middle')
-//             .attr('transform','translate('+0+','+4+')');
+        // state abbr labels not functioning
+        // //names
+        // var names = map.selectAll('.stateAbr')
+        //     .data(data, function(d){return d.state});
 
-//         //TODO: create a force layout
-//         //with what physical parameters?
-//         var force = d3.layout.force()
-//             .size([width,height])
-//             .charge(-40)
-//             .gravity(.01);
+        // //state name labels
+        // var names_enter = names.enter()
+        //     .append('text')
+        //     .attr('class','stateAbr')
+        //     .style('opacity',0)
+        //     .text(function(d){
+        //         return d.abbr;
+        //     })
+        //     .attr('text-anchor','middle');
 
-//         force.nodes(data)
-//             .on('tick', onForceTick)
-//             .start();
+        // names.exit()
+        //     .transition()
+        //     .remove();
+        
+		//enter exit update
+        var nodes = map.selectAll('state')
+            .data(data, function(d){return d.state});
+            
+        var nodes_enter = nodes.enter()
+            .append('circle')
+            .attr('class','state')
+            .style('fill','#B74077')
+            .call(attachTooltip);
 
-//         function onForceTick(e){
-//             var q = d3.geom.quadtree(data),
-//                 i = 0,
-//                 n = data.length;
+        var nodes_exit = nodes.exit().transition().remove();
 
-//             while( ++i<n ){
-//                 q.visit(collide(data[i]));
-//             }
+        //button selection
+        d3.selectAll('.btn').on('click', function(){
 
-//             nodes
-//                 .each(gravity(e.alpha*.05))
-//                 .attr('transform',function(d){
-//                         return 'translate('+d.x+','+d.y+')';
-//                     })
+            var selection = d3.select(this).attr('id');
 
-//             function gravity(k){
-//                 return function(d){
-//                     d.y += (d.y0 - d.y)*k;
-//                     d.x += (d.x0 - d.x)*k;
-//                 }
-//             }
+            if(selection == 'scatterplot'){
+                force.stop();
 
-//             function collide(dataPoint){
-//                 var nr = dataPoint.r + 5,
-//                     nx1 = dataPoint.x - nr,
-//                     ny1 = dataPoint.y - nr,
-//                     nx2 = dataPoint.x + nr,
-//                     ny2 = dataPoint.y + nr;
+                nodes
+                    .transition().duration(500)
+                    .attr('r',5)
+                    .style('fill','#B74077')
+                    .attr('transform', function(d){
+                        return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+                    })
 
-//                 return function(quadPoint,x1,y1,x2,y2){
-//                     if(quadPoint.point && (quadPoint.point !== dataPoint)){
-//                         var x = dataPoint.x - quadPoint.point.x,
-//                             y = dataPoint.y - quadPoint.point.y,
-//                             l = Math.sqrt(x*x+y*y),
-//                             r = nr + quadPoint.point.r;
-//                         if(l<r){
-//                             l = (l-r)/l*.1;
-//                             dataPoint.x -= x*= (l*.05);
-//                             dataPoint.y -= y*= l;
-//                             quadPoint.point.x += (x*.05);
-//                             quadPoint.point.y += y;
-//                         }
-//                     }
-//                     return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
-//                 }
-//             }
-//         }
-// 	});
+                // names.style('opacity',0);
+                legend.style('opacity',0);
+                axis_x_l_enter.style('opacity',1);
+                axis_y_l_enter.style('opacity',1);
+            } 
+            else if (selection == 'scaled'){
+                force.stop();
+                
+                nodes
+                    .transition().duration(1000)
+                    .attr('r', function(d){
+                        return scaleR(d.pop);
+                    })
+                    .attr('transform', function(d){
+                        return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
+                    })
+                    .style('fill', function(d){
+                        return scaleColor(d.pctObese)
+                    })
+
+                // names.style('opacity',0);
+                legend.style('opacity',1);
+                axis_x_l_enter.style('opacity',1);
+                axis_y_l_enter.style('opacity',1);
+            } 
+            else {
+                nodes
+                    .transition().duration(1000)
+                
+                force.nodes(data)
+                    .on('tick', onForceTick)
+                    .start();
+
+                // names.style('opacity',1);
+                legend.style('opacity',1);
+                axis_x_l_enter.style('opacity',0);
+                axis_y_l_enter.style('opacity',0);
+            }
+        })
+
+    function onForceTick(e){
+        var q = d3.geom.quadtree(data),
+            i = 0,
+            n = data.length;
+
+        while( ++i<n ){
+            q.visit(collide(data[i]));
+        }
+
+        nodes
+            .each(gravity(e.alpha*.05))
+            .attr('transform',function(d){
+                    return 'translate('+d.x+','+d.y+')';
+                })
+
+        function gravity(k){
+            return function(d){
+                d.y += (d.y0 - d.y)*k;
+                d.x += (d.x0 - d.x)*k;
+            }
+        }
+
+        function collide(dataPoint){
+            var nr = dataPoint.r + 5,
+                nx1 = dataPoint.x - nr,
+                ny1 = dataPoint.y - nr,
+                nx2 = dataPoint.x + nr,
+                ny2 = dataPoint.y + nr;
+
+            return function(quadPoint,x1,y1,x2,y2){
+                if(quadPoint.point && (quadPoint.point !== dataPoint)){
+                    var x = dataPoint.x - quadPoint.point.x,
+                        y = dataPoint.y - quadPoint.point.y,
+                        l = Math.sqrt(x*x+y*y),
+                        r = nr + quadPoint.point.r;
+                    if(l<r){
+                        l = (l-r)/l*.1;
+                        dataPoint.x -= x*= (l*.05);
+                        dataPoint.y -= y*= l;
+                        quadPoint.point.x += (x*.05);
+                        quadPoint.point.y += y;
+                    }
+                }
+                return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
+            }
+        }
+    }
+
+    function attachTooltip(selection){
+        selection
+            .on('mouseenter',function(d){
+                var tooltip = d3.select('.custom-tooltip');
+                
+                tooltip
+                    .transition()
+                    .style('opacity',1);
+               
+                tooltip.select('#name').html(d.stateName);
+                tooltip.select('#obese').html(d.pctObese);
+                tooltip.select('#park').html(d.pctPark); 
+                tooltip.select('#income').html(d.income); 
+                })
+
+            .on('mousemove',function(){
+                var tooltip = d3.select('.custom-tooltip');
+                
+                tooltip
+                    .style('left',(d3.event.pageX+"px"))
+                    .style('top',(d3.event.pageY+"px"))
+                })
+
+            .on('mouseleave',function(){
+                d3.select('.custom-tooltip')
+                    .transition()
+                    .style('opacity',0);
+                }) 
+    }         
+}	
 
 
-
-function parse(d){
+function parseData(d){
     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
+
+    obByState.set(+d.STATE,{
+        name: d.NAME,
+        state: d.STATE,
+        pctPark: +d.pctPark,
+        income: +d.income,
+        popObese: +d.popObese,
+        pctObese: +d.pctObese,
+        abbr: d.ABR,
+        pop: +d.pop
+    });
 
     return {
         name: d.NAME,
@@ -253,24 +295,8 @@ function parse(d){
         pctPark: +d.pctPark,
         income: +d.income,
         popObese: +d.popObese,
-        pctObese: +d.pctObese
+        pctObese: +d.pctObese,
+        abbr: d.ABR,
+        pop: +d.pop
     };
 }
-
-// function parseData(d){
-//     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
-
-//     obByState.set(d.STATE,{
-//         'name': d.NAME,
-//         'state': d.STATE,
-//         popObese:+d.popObese,
-//         pctObese:+d.pctObese
-//     });
-
-//     return {
-//         'name': d.NAME,
-//         'state': d.STATE,
-//         popObese:+d.popObese,
-//         pctObese:+d.pctObese
-//     }
-// }
