@@ -106,6 +106,12 @@ function dataLoaded(err, states, obesity){
 
         //PR filter
         data = data.filter(function(d){return d!=undefined});
+        
+        //trying to write code to plot bubbles in ascending order
+        //data = data.sort(d3.descending);
+
+        data = data.sort(function(a, b){return d3.descending(a.popObese, b.popObese)});
+
 
         console.log(data);
 
@@ -114,15 +120,14 @@ function dataLoaded(err, states, obesity){
             .data(data, function(d){return d.state});
 
         //state name labels
-        names
-            .enter()
+        var names_enter = names.enter()
             .append('text')
             .attr('class','stateAbr')
+            .style('opacity',0)
             .text(function(d){
-                return (obByState.get(+d.state)).abbr;
+                return d.abbr;
             })
-            .attr('text-anchor','middle')
-            .attr('transform','translate('+0+','+4+')');
+            .attr('text-anchor','middle');
 
         names.exit()
             .transition()
@@ -134,18 +139,15 @@ function dataLoaded(err, states, obesity){
             
         var nodes_enter = nodes.enter()
             .append('circle')
+            .attr('class','state')
             .attr('r',5)
             .style('fill','#B74077')
+            .style('opacity',0)
             .call(attachTooltip);
 
         var nodes_exit = nodes.exit().transition().remove();
 
-        // function cartogram(data){
-        //     force.nodes(data)
-        //     .on('tick', onForceTick)
-        //     .start();
-        // }
-
+        //button selection
         d3.selectAll('.btn').on('click', function(){
 
             var selection = d3.select(this).attr('id');
@@ -155,12 +157,14 @@ function dataLoaded(err, states, obesity){
 
                 nodes
                     .transition().duration(500)
+                    .style('opacity',1)
                     .attr('r',5)
                     .style('fill','#B74077')
                     .attr('transform', function(d){
                         return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
                     })
 
+                names.style('opacity',0);
                 legend.style('opacity',0);
                 axis_x_l_enter.style('opacity',1);
                 axis_y_l_enter.style('opacity',1);
@@ -170,7 +174,7 @@ function dataLoaded(err, states, obesity){
                 
                 nodes
                     .transition().duration(500)
-                    .attr('class','state')
+                    .style('opacity',1)
                     .attr('r', function(d){
                         return scaleR(d.popObese);
                     })
@@ -181,18 +185,21 @@ function dataLoaded(err, states, obesity){
                         return scaleColor(d.pctObese)
                     })
 
-                    legend.style('opacity',1);
-                    axis_x_l_enter.style('opacity',1);
-                    axis_y_l_enter.style('opacity',1);
+                names.style('opacity',0);
+                legend.style('opacity',1);
+                axis_x_l_enter.style('opacity',1);
+                axis_y_l_enter.style('opacity',1);
             } 
             else {
                 nodes
                     .transition().duration(500)
+                    .style('opacity',1)
                 
                 force.nodes(data)
                     .on('tick', onForceTick)
                     .start();
 
+                // names.style('opacity',1);
                 legend.style('opacity',1);
                 axis_x_l_enter.style('opacity',0);
                 axis_y_l_enter.style('opacity',0);
@@ -247,41 +254,38 @@ function dataLoaded(err, states, obesity){
         }
     }
 
-         
+    function attachTooltip(selection){
+        selection
+            .on('mouseenter',function(d){
+            var tooltip = d3.select('.custom-tooltip');
+            
+            tooltip
+                .transition()
+                .style('opacity',1);
+           
+            tooltip.select('#name').html(d.stateName);
+            tooltip.select('#obese').html(d.pctObese);
+            tooltip.select('#park').html(d.pctPark); 
+            tooltip.select('#income').html(d.income); 
+            })
+
+            .on('mousemove',function(){
+            var xy = d3.mouse(map.node());
+            
+            var tooltip = d3.select('.custom-tooltip');
+            
+            tooltip
+                .style('left',(d3.event.pageX+"px"))
+                .style('top',(d3.event.pageY+"px"))
+            })
+
+            .on('mouseleave',function(){
+            d3.select('.custom-tooltip')
+                .transition()
+                .style('opacity',0);
+            }) 
+    }         
 }	
-
-function attachTooltip(selection){
-            selection
-                .on('mouseenter',function(d){
-                var tooltip = d3.select('.custom-tooltip');
-                
-                tooltip
-                    .transition()
-                    .style('opacity',1);
-               
-                tooltip.select('#name').html(d.name);
-                tooltip.select('#obese').html(d.pctObese);
-                tooltip.select('#park').html(d.pctPark); 
-                tooltip.select('#income').html(d.income); 
-                })
-
-                .on('mousemove',function(){
-                var xy = d3.mouse(map.node());
-                
-                var tooltip = d3.select('.custom-tooltip');
-                
-                tooltip
-                    .style('left',(d3.event.pageX+"px"))
-                    .style('top',(d3.event.pageY+"px"))
-                })
-
-                .on('mouseleave',function(){
-                d3.select('.custom-tooltip')
-                    .transition()
-                    .style('opacity',0);
-                }) 
-        } 
-
 
 
 function parseData(d){
