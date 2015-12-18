@@ -133,9 +133,7 @@ function dataLoaded(err, states, obesity){
         var nodes_enter = nodes.enter()
             .append('circle')
             .attr('class','state')
-            .attr('r',5)
             .style('fill','#B74077')
-            .style('opacity',0)
             .call(attachTooltip);
 
         var nodes_exit = nodes.exit().transition().remove();
@@ -150,7 +148,6 @@ function dataLoaded(err, states, obesity){
 
                 nodes
                     .transition().duration(500)
-                    .style('opacity',1)
                     .attr('r',5)
                     .style('fill','#B74077')
                     .attr('transform', function(d){
@@ -167,7 +164,6 @@ function dataLoaded(err, states, obesity){
                 
                 nodes
                     .transition().duration(500)
-                    .style('opacity',1)
                     .attr('r', function(d){
                         return scaleR(d.popObese);
                     })
@@ -186,7 +182,6 @@ function dataLoaded(err, states, obesity){
             else {
                 nodes
                     .transition().duration(500)
-                    .style('opacity',1)
                 
                 force.nodes(data)
                     .on('tick', onForceTick)
