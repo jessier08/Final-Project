@@ -28,7 +28,7 @@ var scaleR = d3.scale.linear().domain([100000,6300000]).range([8,80]),
 //force layout
 var force = d3.layout.force()
     .size([width,height])
-    .charge(-20)
+    .charge(-30)
     .gravity(0);
 
 //legend
@@ -40,7 +40,6 @@ var legend = d3.select('.legend')
 // axis labels
 axis_label_dy = ['Income Per Capita']
 axis_label_dx = ['% of People Living Within 1/2 mile of a Park']
-
 var axis_x = map.append('g')
     .attr('class','axis')
     .style('fill','rgb(180,180,180)')
@@ -53,7 +52,6 @@ var axis_x_l_enter = axis_x_l.enter()
     .style('opacity',0);   
 var axis_x_l_exit = axis_x_l.exit().remove();
     axis_x_l.text(function(d) {return d;})
-
 var axis_y = map.append('g')
     .attr('class','axis')
     .style('fill','rgb(180,180,180)')
@@ -73,65 +71,60 @@ queue()
     .defer(d3.csv, "data/parkIncOb.csv", parseData)
 	.await(dataLoaded);
 
+//all drawing in here
 function dataLoaded(err, states, obesity){
-
-        // var maxOb = d3.max(obesity);
-        // scaleR.domain([0,maxOb.popObese]);
-
         //construct a new array of data
         var data = states.features.map(function(d){
-        //if a state is not in both data files, return nothing
-        if(!obByState.get(+d.properties.STATE)){return;
-        } else {
+            //if a state is not in both data files, return nothing
+            if(!obByState.get(+d.properties.STATE)){return;
+            } 
+            else {
+                var centroid = path.centroid(d);
 
-            var centroid = path.centroid(d);
-
-            centroidByState.set(d.properties.NAME, centroid)
-                return {
-                    stateName:d.properties.NAME,
-                    state:+d.properties.STATE,
-                    x0:centroid[0],
-                    y0:centroid[1],
-                    x:centroid[0],
-                    y:centroid[1],
-                    r:scaleR((obByState.get(+d.properties.STATE).popObese)),
-                    pctObese: ((obByState.get(+d.properties.STATE).pctObese)),
-                    pctPark: ((obByState.get(+d.properties.STATE).pctPark)),
-                    popObese: ((obByState.get(+d.properties.STATE).popObese)),
-                    abbr: ((obByState.get(+d.properties.STATE).abbr)),
-                    income: ((obByState.get(+d.properties.STATE).income))
-                }
-        }
+                centroidByState.set(d.properties.NAME, centroid)
+                    return {
+                        stateName:d.properties.NAME,
+                        state:+d.properties.STATE,
+                        x0:centroid[0],
+                        y0:centroid[1],
+                        x:centroid[0],
+                        y:centroid[1],
+                        r:scaleR((obByState.get(+d.properties.STATE).popObese)),
+                        pctObese: ((obByState.get(+d.properties.STATE).pctObese)),
+                        pctPark: ((obByState.get(+d.properties.STATE).pctPark)),
+                        popObese: ((obByState.get(+d.properties.STATE).popObese)),
+                        abbr: ((obByState.get(+d.properties.STATE).abbr)),
+                        income: ((obByState.get(+d.properties.STATE).income))
+                    }
+            }
         }),
 
         //PR filter
         data = data.filter(function(d){return d!=undefined});
         
-        //trying to write code to plot bubbles in ascending order
-        //data = data.sort(d3.descending);
-
+        //plot circles from greatest to least
         data = data.sort(function(a, b){return d3.descending(a.popObese, b.popObese)});
-
 
         console.log(data);
 
-        //names
-        var names = map.selectAll('.stateAbr')
-            .data(data, function(d){return d.state});
+        // state abbr labels not functioning
+        // //names
+        // var names = map.selectAll('.stateAbr')
+        //     .data(data, function(d){return d.state});
 
-        //state name labels
-        var names_enter = names.enter()
-            .append('text')
-            .attr('class','stateAbr')
-            .style('opacity',0)
-            .text(function(d){
-                return d.abbr;
-            })
-            .attr('text-anchor','middle');
+        // //state name labels
+        // var names_enter = names.enter()
+        //     .append('text')
+        //     .attr('class','stateAbr')
+        //     .style('opacity',0)
+        //     .text(function(d){
+        //         return d.abbr;
+        //     })
+        //     .attr('text-anchor','middle');
 
-        names.exit()
-            .transition()
-            .remove();
+        // names.exit()
+        //     .transition()
+        //     .remove();
         
 		//enter exit update
         var nodes = map.selectAll('state')
@@ -164,7 +157,7 @@ function dataLoaded(err, states, obesity){
                         return 'translate('+scaleX(d.pctPark)+','+scaleY(d.income)+')';
                     })
 
-                names.style('opacity',0);
+                // names.style('opacity',0);
                 legend.style('opacity',0);
                 axis_x_l_enter.style('opacity',1);
                 axis_y_l_enter.style('opacity',1);
@@ -185,7 +178,7 @@ function dataLoaded(err, states, obesity){
                         return scaleColor(d.pctObese)
                     })
 
-                names.style('opacity',0);
+                // names.style('opacity',0);
                 legend.style('opacity',1);
                 axis_x_l_enter.style('opacity',1);
                 axis_y_l_enter.style('opacity',1);
