@@ -1,0 +1,170 @@
+html,body,div,ul,li,svg{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+/*------------Global-------------*/
+html,body{
+    height: 100%;
+    position: relative;
+}
+
+.container .canvas{
+    width:100%;
+    background:white;
+    height:700px;
+    margin-top:-20px;
+}
+.container .controls{
+    margin-bottom:20px;
+}
+
+/*-----------tooltip-----------*/
+.custom-tooltip{
+    position:absolute;
+    background-color: rgba(255,255,255,.8);
+    width:150px;
+    min-height:10px;
+    padding-left: 10px;
+}
+.custom-tooltip p{
+    font-size: 10px;
+    font-family:'MaisonNeue', sans-serif;
+}
+.tooltip h1{
+    font-size: 15px;
+}
+.num{
+    font-size: 15px;
+    font-family:'MaisonNeue', sans-serif;
+}
+
+/*------------font-------------*/
+body{
+    font-size: 16px;
+}
+h1{ 
+    font-size:2em;
+    color:#B74077;
+    font-family:'MaisonNeue', sans-serif;
+}
+h2{ 
+    font-size:1.3em;
+    font-family:'MaisonNeue', sans-serif;
+}
+p, svg text{
+    /*font-family:'MaisonNeue', sans-serif;*/
+}
+
+.axis {
+    font-size:.7em;
+    font-family: helvetica;
+}
+
+@font-face{
+    font-family:MaisonNeue;
+    font-weight:bold;
+    src:url("./fonts/maisonneue/MaisonNeueTRIAL-Bold.otf");
+}
+@font-face{
+    font-family:MaisonNeue;
+    font-weight:normal;
+    src:url("./fonts/maisonneue/MaisonNeueTRIAL-Demi.otf");
+}
+
+/*------------map-------------*/
+.stateAbr {
+    font-size:10px;
+    opacity:.6;
+    stroke:none;
+    stroke-width:none;
+}
+.circle {
+    stroke:white;
+    stroke-width:.5px;
+    /*opacity: .8;*/
+}
+.state{
+    stroke:white;
+    stroke-width:0.5px;
+}
+
+/*-----------buttons-------------*/
+.btn{
+    width:250px;
+    text-align: left;
+    padding: 10px 0px 10px 20px;
+}
+.btn-group{
+    margin-top:20px;
+}
+.btn:focus, .btn:active:focus, .btn.active:focus{
+    outline:none;
+    /*box-shadow:0px 0px 5px 0px rgba(183,64,119,1);*/
+    box-shadow: none;
+}
+button.selected{
+    background-color:#E6E7E7; 
+}
+
+/*-----------legend-------------*/
+.legend{
+    width:180px;
+    min-height:150px;
+    position: absolute;
+    right:10%;
+    top:80%;
+}
+.info{
+    width:100%;
+    height:250px;
+    margin-top:-50px;
+}
+.info p{
+    font-family: helvetica;
+}
+.infoDiv{
+    float:left;
+    min-height: 10px;
+    width:33%;
+    padding: 0px 10px 10px 10px;
+    font-size:.9em;
+}
+.infoDivMid{
+    float:left;
+    min-height: 10px;
+    width:33%;
+    margin-top:70px;
+    margin-left:20px;
+    font-size:.9em;
+}
+.infoDivBottom{
+    float:left;
+    min-height: 10px;
+    width:33%;
+    text-align: right;
+    margin-top:140px;
+    margin-left:-20px;
+}
+.infoDivBottom p{
+    font-size: .7em;
+}
+.hr{
+    background-color: #e6e7e7;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

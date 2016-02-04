@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>d3 Final</title>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,400italic' rel='stylesheet' type='text/css'>
+        <link href="css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="css/style.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Obesity x Park Proximity x Income</h1>
+			
+			<div class="btn-group" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" id="scatterplot">Do lower income people have<br>less access to parks?</button>
+                <button type="button" class="btn btn-default" id="scaled">
+                Are these people more<br>susceptible to obesity?</button>
+                <button type="button" class="btn btn-default" id="cartogram">Where in the United States are<br>these factors an issue?</button>
+            </div>
+
+			<div class="canvas" id="map">
+				<div class="custom-tooltip tooltip">
+                    <h2 id="name"></h2>
+                    <p><span class="num" id="obese"></span><span class="num">%</span>  obese</p>
+                    <p><span class="num" id="park"></span><span class="num">%</span>  close to park</p>
+                    <p><span class="num">$</span><span class="num" id="income"></span>  income per capita</p>
+                </div>
+
+                <div class="legend">
+                </div>
+			</div>
+
+            <div class="info">
+                <hr class="hr" width="100%">
+                <div class="infoDiv">
+                    <h2> Do parks, wealth and health correlate?</h2>
+                    <br>
+                    <p>Research shows that people with greater access to public spaces, such as neighborhood or state parks, are likely to be more physically active, and we can arguably assume have lower rates of obesity. There may also be a relationship between the per capita income of a state and its relative access to parks, as wealthier state's governments are often more involved in the community.</p> 
+                </div>
+
+                <div class="infoDivMid" >
+                    <p>This series of graphs explores the relationship between these data points, including where obesity issues are concentrated in the states. All data is based on figures from 2012.</p> 
+                </div>
+
+                <div class="infoDivBottom">
+                    <p>Data Sources <a href="http://www.bea.gov/iTable/iTable.cfm?reqid=70&step=1&isuri=1&acrdn=3#reqid=70&step=1&isuri=1&7022=21&7023=0&7024=non-industry&7033=-1&7025=0&7026=xx&7027=2012&7001=421&7028=3&7031=0&7040=-1&7083=levels&7029=21&7090=70">BEA</a>   <a href="https://nccd.cdc.gov/NPAO_DTM/Default.aspx">CDC</a></p>
+                    <p>Design by Jessie Richards</p>
+                </div>
+            </div>
+
+		</div><!--.container-->
+
+		<!-- Scripts -->
+        <script src="script/lib/d3/d3.min.js" charset="utf-8"></script>
+        <script src="script/lib/queue/queue.min.js"></script>
+        <script src="script/lib/jquery/jquery-1.11.1.min.js"></script>
+        <script src="script/script.js"></script>
+        <!-- <script src="script/script2.js"></script> -->
+	</body>
+</html>
